@@ -298,8 +298,8 @@
         <div class="game-icon" aria-hidden="true">🧟</div>
         <div class="game-copy">
           <h2>Zombie Escape</h2>
-          <p>Clear each block, collect supplies, and reach the exit.</p>
-          <span class="best" id="zombie-best">High score: 0 · 🪙 0</span>
+          <p>Rotate roads and connect a safe path to the exit.</p>
+          <span class="best" id="zombie-best">Level 1 · 🪙 0</span>
         </div>
         <span class="play" aria-hidden="true">▶</span>
       </a>
@@ -325,12 +325,19 @@
         document.getElementById("shooter-best").textContent =
           `High score: ${safeScore.toLocaleString()} · 🪙 ${safeCoins.toLocaleString()}`;
 
-        const zombieScore = Number.parseInt(localStorage.getItem("zombie-escape-best-v1"), 10);
         const zombieCoins = Number.parseInt(localStorage.getItem("zombie-escape-coins-v1"), 10);
-        const safeZombieScore = Number.isFinite(zombieScore) && zombieScore > 0 ? zombieScore : 0;
         const safeZombieCoins = Number.isFinite(zombieCoins) && zombieCoins > 0 ? zombieCoins : 0;
+        let zombieLevel = 1;
+        try {
+          const zombieProgress = JSON.parse(localStorage.getItem("zombie-puzzle-progress-v1"));
+          if (zombieProgress && Number.isInteger(zombieProgress.unlockedLevel)) {
+            zombieLevel = Math.max(1, Math.min(30, zombieProgress.unlockedLevel));
+          }
+        } catch (error) {
+          console.warn("Zombie puzzle progress could not be loaded.", error);
+        }
         document.getElementById("zombie-best").textContent =
-          `High score: ${safeZombieScore.toLocaleString()} · 🪙 ${safeZombieCoins.toLocaleString()}`;
+          `Level ${zombieLevel} · 🪙 ${safeZombieCoins.toLocaleString()}`;
       } catch (error) {
         console.warn("Saved scores could not be loaded.", error);
       }

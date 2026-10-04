@@ -1,7 +1,7 @@
 {
   "name": "Pocket Arcade",
   "short_name": "Arcade",
-  "description": "A colorful pocket arcade with Critter Match and Star Defender.",
+  "description": "A colorful pocket arcade with Critter Match, Star Defender, and Zombie Escape puzzles.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

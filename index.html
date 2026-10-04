@@ -142,6 +142,14 @@
         linear-gradient(145deg, #162b29, #315e45 55%, #50334f);
     }
 
+    .runner {
+      color: var(--white);
+      background:
+        radial-gradient(circle at 83% 17%, rgba(255, 221, 106, 0.32) 0 9%, transparent 10%),
+        radial-gradient(circle at 14% 80%, rgba(133, 233, 105, 0.2) 0 13%, transparent 14%),
+        linear-gradient(145deg, #163a2d, #477444 55%, #8c5638);
+    }
+
     .game-icon {
       display: grid;
       place-items: center;
@@ -160,6 +168,10 @@
 
     .zombie .game-icon {
       background: rgba(145, 236, 98, 0.17);
+    }
+
+    .runner .game-icon {
+      background: rgba(255, 213, 91, 0.18);
     }
 
     .game-copy {
@@ -182,7 +194,8 @@
     }
 
     .shooter .game-copy p,
-    .zombie .game-copy p {
+    .zombie .game-copy p,
+    .runner .game-copy p {
       color: #dce4ff;
     }
 
@@ -207,6 +220,11 @@
       color: #eaffdf;
     }
 
+    .runner .best {
+      background: rgba(255, 215, 93, 0.2);
+      color: #fff3c4;
+    }
+
     .play {
       display: grid;
       place-items: center;
@@ -229,6 +247,12 @@
       color: #183520;
       background: #9af06d;
       box-shadow: 0 4px 0 #3f944b;
+    }
+
+    .runner .play {
+      color: #4b3211;
+      background: #ffd35c;
+      box-shadow: 0 4px 0 #a96d1d;
     }
 
     footer {
@@ -303,9 +327,19 @@
         </div>
         <span class="play" aria-hidden="true">▶</span>
       </a>
+
+      <a class="game-card runner" href="runner.html">
+        <div class="game-icon" aria-hidden="true">🏃</div>
+        <div class="game-copy">
+          <h2>Ruins Rush</h2>
+          <p>Swipe through jungle ruins, dodge traps, and collect coins.</p>
+          <span class="best" id="runner-best">Best: 0 m · 🪙 0</span>
+        </div>
+        <span class="play" aria-hidden="true">▶</span>
+      </a>
     </nav>
 
-    <footer>Three games · Touch controls · Plays offline after loading</footer>
+    <footer>Four games · Touch controls · Plays offline after loading</footer>
   </main>
 
   <script>
@@ -338,6 +372,13 @@
         }
         document.getElementById("zombie-best").textContent =
           `Level ${zombieLevel} · 🪙 ${safeZombieCoins.toLocaleString()}`;
+
+        const runnerDistance = Number.parseInt(localStorage.getItem("ruins-rush-best-v1"), 10);
+        const runnerCoins = Number.parseInt(localStorage.getItem("ruins-rush-coins-v1"), 10);
+        const safeRunnerDistance = Number.isFinite(runnerDistance) && runnerDistance > 0 ? runnerDistance : 0;
+        const safeRunnerCoins = Number.isFinite(runnerCoins) && runnerCoins > 0 ? runnerCoins : 0;
+        document.getElementById("runner-best").textContent =
+          `Best: ${safeRunnerDistance.toLocaleString()} m · 🪙 ${safeRunnerCoins.toLocaleString()}`;
       } catch (error) {
         console.warn("Saved scores could not be loaded.", error);
       }

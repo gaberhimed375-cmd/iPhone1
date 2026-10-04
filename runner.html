@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#173d36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ruins Rush">
+  <link rel="manifest" href="manifest.webmanifest">
+  <script src="register-sw.js" defer></script>
+  <title>Ruins Rush</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --jungle: #173d36;
+      --lime: #a9f06f;
+      --gold: #ffd35b;
+      --orange: #ff9d4a;
+      --white: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: max(8px, env(safe-area-inset-top)) 10px max(9px, env(safe-area-inset-bottom));
+      color: var(--white);
+      font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 15% 8%, rgba(255, 210, 91, 0.17), transparent 30%),
+        linear-gradient(160deg, #0c251f, #1f4838 58%, #403536);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button,
+    a {
+      font: inherit;
+      touch-action: manipulation;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: min(100%, 430px);
+      min-height: 0;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 44px 1fr auto auto;
+      align-items: center;
+      gap: 7px;
+      min-height: 50px;
+      padding-bottom: 7px;
+    }
+
+    .icon-button {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 2px solid rgba(255, 255, 255, 0.42);
+      border-radius: 13px;
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.1);
+      text-decoration: none;
+      font-size: 1.12rem;
+      font-weight: 950;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .coin-display {
+      width: auto;
+      min-width: 60px;
+      padding: 0 8px;
+      color: #3d2a08;
+      background: linear-gradient(145deg, #ffed92, #ffbe3f);
+      border-color: #fff1b7;
+      box-shadow: 0 4px 0 #a96918;
+      font-size: 0.74rem;
+    }
+
+    .icon-button:active,
+    .move-button:active {
+      transform: scale(0.94);
+    }
+
+    .game-name {
+      min-width: 0;
+    }
+
+    .game-name strong {
+      display: block;
+      overflow: hidden;
+      color: var(--lime);
+      font-size: 1.06rem;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 0 2px 0 #286a39;
+    }
+
+    .game-name span {
+      color: #bdd7c3;
+      font-size: 0.62rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .arena {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border: 3px solid rgba(169, 240, 111, 0.72);
+      border-radius: 24px;
+      background: var(--jungle);
+      box-shadow: 0 0 0 3px rgba(48, 105, 62, 0.62), 0 11px 28px rgba(0, 0, 0, 0.46);
+      aspect-ratio: 390 / 650;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    .hud {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      right: 9px;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .stat {
+      padding: 6px 4px;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 11px;
+      background: rgba(10, 37, 29, 0.76);
+      text-align: center;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .stat small {
+      display: block;
+      color: #b4d0b9;
+      font-size: 0.5rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 1px;
+      font-size: 0.8rem;
+    }
+
+    .move-controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding-top: 8px;
+    }
+
+    .move-button {
+      min-height: 42px;
+      padding: 5px;
+      border: 2px solid rgba(255, 255, 255, 0.38);
+      border-radius: 13px;
+      color: #f5ffef;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.24);
+      font-size: 1rem;
+      font-weight: 950;
+    }
+
+    .hint {
+      margin: 6px 0 0;
+      color: #a1bca8;
+      font-size: 0.64rem;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      padding: 23px;
+      background: rgba(5, 20, 16, 0.75);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .panel {
+      width: min(100%, 330px);
+      padding: 23px 19px 21px;
+      border: 3px solid var(--lime);
+      border-radius: 24px;
+      background: linear-gradient(155deg, rgba(28, 66, 48, 0.98), rgba(81, 54, 44, 0.98));
+      box-shadow: 0 8px 0 #0b1b16, 0 0 30px rgba(169, 240, 111, 0.22);
+      text-align: center;
+      transform: scale(0.92);
+      transition: transform 220ms cubic-bezier(0.2, 1.3, 0.5, 1);
+    }
+
+    .overlay.visible .panel {
+      transform: scale(1);
+    }
+
+    .panel-icon {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 3.7rem;
+      filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.25));
+    }
+
+    .panel h1 {
+      margin: 0 0 8px;
+      color: var(--lime);
+      font-size: clamp(1.8rem, 9vw, 2.55rem);
+      line-height: 0.96;
+      text-shadow: 0 4px 0 #2d733f;
+    }
+
+    .panel p {
+      margin: 0 0 16px;
+      color: #e0eee0;
+      font-size: 0.82rem;
+      font-weight: 750;
+      line-height: 1.48;
+    }
+
+    .instructions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+      margin-bottom: 17px;
+    }
+
+    .instruction {
+      padding: 7px 4px;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.09);
+      color: #f3f9ed;
+      font-size: 0.62rem;
+      font-weight: 850;
+    }
+
+    .instruction b {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 1.15rem;
+    }
+
+    .primary-button {
+      width: 100%;
+      min-height: 50px;
+      border: 2px solid #fff;
+      border-radius: 15px;
+      color: #17331e;
+      background: linear-gradient(145deg, #c6fa79, #70dc7e);
+      box-shadow: 0 6px 0 #37834b;
+      font-weight: 950;
+    }
+
+    .primary-button:active {
+      box-shadow: 0 2px 0 #37834b;
+      transform: translateY(4px);
+    }
+
+    @media (max-height: 740px) {
+      .topbar { min-height: 44px; }
+      .icon-button { width: 37px; height: 37px; }
+      .move-controls { padding-top: 5px; }
+      .move-button { min-height: 36px; }
+      .hint { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <a class="icon-button" href="./" aria-label="Back to game menu">‹</a>
+      <div class="game-name">
+        <strong>Ruins Rush</strong>
+        <span>Jungle Runner</span>
+      </div>
+      <div class="icon-button coin-display" aria-label="Collected coins">🪙 <span id="total-coins">0</span></div>
+      <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">🔊</button>
+    </header>
+
+    <section class="arena" aria-label="Ruins Rush endless runner">
+      <canvas id="game-canvas" width="390" height="650" aria-label="Swipe to dodge, jump, and slide"></canvas>
+
+      <div class="hud" aria-live="polite">
+        <div class="stat">
+          <small>Distance</small>
+          <strong id="distance">0 m</strong>
+        </div>
+        <div class="stat">
+          <small>Run Coins</small>
+          <strong id="run-coins">0</strong>
+        </div>
+        <div class="stat">
+          <small>Best</small>
+          <strong id="best">0 m</strong>
+        </div>
+      </div>
+
+      <div class="overlay visible" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+        <div class="panel">
+          <span class="panel-icon" id="panel-icon" aria-hidden="true">🏃</span>
+          <h1 id="panel-title">Ruins Rush</h1>
+          <p id="panel-message">Race through ancient jungle ruins and collect every coin you can.</p>
+          <div class="instructions" id="instructions">
+            <div class="instruction"><b>↔️</b>Swipe to switch lanes</div>
+            <div class="instruction"><b>⬆️⬇️</b>Jump or slide</div>
+          </div>
+          <button class="primary-button" id="action-button" type="button">Start Running</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="move-controls" aria-label="Runner controls">
+      <button class="move-button" id="left-button" type="button" aria-label="Move left">←</button>
+      <button class="move-button" id="jump-button" type="button" aria-label="Jump">↑</button>
+      <button class="move-button" id="slide-button" type="button" aria-label="Slide">↓</button>
+      <button class="move-button" id="right-button" type="button" aria-label="Move right">→</button>
+    </div>
+    <p class="hint">Swipe or use buttons · Jump barriers · Slide under arches · Dodge rocks</p>
+  </main>
+
+  <script>
+    "use strict";
+
+    const WIDTH = 390;
+    const HEIGHT = 650;
+    const HORIZON_Y = 128;
+    const PLAYER_Y = 548;
+    const BEST_KEY = "ruins-rush-best-v1";
+    const COINS_KEY = "ruins-rush-coins-v1";
+    const SOUND_KEY = "ruins-rush-sound-v1";
+
+    const canvas = document.getElementById("game-canvas");
+    const context = canvas.getContext("2d", { alpha: false });
+    const distanceDisplay = document.getElementById("distance");
+    const runCoinsDisplay = document.getElementById("run-coins");
+    const totalCoinsDisplay = document.getElementById("total-coins");
+    const bestDisplay = document.getElementById("best");
+    const soundButton = document.getElementById("sound-button");
+    const overlay = document.getElementById("overlay");
+    const panelIcon = document.getElementById("panel-icon");
+    const panelTitle = document.getElementById("panel-title");
+    const panelMessage = document.getElementById("panel-message");
+    const instructions = document.getElementById("instructions");
+    const actionButton = document.getElementById("action-button");
+    const leftButton = document.getElementById("left-button");
+    const rightButton = document.getElementById("right-button");
+    const jumpButton = document.getElementById("jump-button");
+    const slideButton = document.getElementById("slide-button");
+
+    let state = "start";
+    let soundEnabled = readSound();
+    let audioContext = null;
+    let bestDistance = readNumber(BEST_KEY);
+    let totalCoins = readNumber(COINS_KEY);
+    let distance = 0;
+    let runCoins = 0;
+    let speed = 0.185;
+    let spawnTimer = 0;
+    let lastFrameTime = 0;
+    let gameTime = 0;
+    let lane = 0;
+    let visualLane = 0;
+    let jumpHeight = 0;
+    let jumpVelocity = 0;
+    let slideTimer = 0;
+    let shield = false;
+    let magnetUntil = 0;
+    let doubleUntil = 0;
+    let swipeStart = null;
+    let sceneryOffset = 0;
+    let objects = [];
+    let particles = [];
+
+    function readNumber(key) {
+      try {
+        const value = Number.parseInt(localStorage.getItem(key), 10);
+        return Number.isFinite(value) && value >= 0 ? value : 0;
+      } catch (error) {
+        console.warn(`Saved value ${key} could not be read.`, error);
+        return 0;
+      }
+    }
+
+    function readSound() {
+      try {
+        return localStorage.getItem(SOUND_KEY) !== "off";
+      } catch (error) {
+        return true;
+      }
+    }
+
+    function saveProgress() {
+      try {
+        localStorage.setItem(BEST_KEY, String(bestDistance));
+        localStorage.setItem(COINS_KEY, String(totalCoins));
+        localStorage.setItem(SOUND_KEY, soundEnabled ? "on" : "off");
+      } catch (error) {
+        console.warn("Ruins Rush progress could not be saved.", error);
+      }
+    }
+
+    function configureCanvas() {
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(WIDTH * pixelRatio);
+      canvas.height = Math.round(HEIGHT * pixelRatio);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      context.imageSmoothingEnabled = true;
+    }
+
+    function clamp(value, minimum, maximum) {
+      return Math.max(minimum, Math.min(maximum, value));
+    }
+
+    function randomLane() {
+      return Math.floor(Math.random() * 3) - 1;
+    }
+
+    function randomBetween(minimum, maximum) {
+      return minimum + Math.random() * (maximum - minimum);
+    }
+
+    function initializeAudio() {
+      if (!soundEnabled) return;
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!audioContext) audioContext = new AudioContextClass();
+        if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+      } catch (error) {
+        console.warn("Audio is unavailable.", error);
+      }
+    }
+
+    function playTone(frequency, duration, type = "sine", volume = 0.05, delay = 0) {
+      if (!soundEnabled) return;
+      try {
+        initializeAudio();
+        if (!audioContext) return;
+        const start = audioContext.currentTime + delay;
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(frequency, start);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(volume, start + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start(start);
+        oscillator.stop(start + duration + 0.03);
+      } catch (error) {
+        console.warn("A sound could not be played.", error);
+      }
+    }
+
+    function vibrate(pattern) {
+      try {
+        if (typeof navigator.vibrate === "function") navigator.vibrate(pattern);
+      } catch (error) {
+        console.warn("Haptic feedback is unavailable.", error);
+      }
+    }
+
+    function roadHalfWidth(progress) {
+      return 48 + clamp(progress, 0, 1.1) * 162;
+    }
+
+    function projectedY(progress) {
+      const safeProgress = clamp(progress, 0, 1.1);
+      return HORIZON_Y + Math.pow(safeProgress, 1.62) * (HEIGHT - HORIZON_Y);
+    }
+
+    function laneX(targetLane, progress) {
+      return WIDTH / 2 + targetLane * roadHalfWidth(progress) * 0.57;
+    }
+
+    function resetGame() {
+      distance = 0;
+      runCoins = 0;
+      speed = 0.185;
+      spawnTimer = 0.45;
+      gameTime = 0;
+      lane = 0;
+      visualLane = 0;
+      jumpHeight = 0;
+      jumpVelocity = 0;
+      slideTimer = 0;
+      shield = false;
+      magnetUntil = 0;
+      doubleUntil = 0;
+      sceneryOffset = 0;
+      objects = [];
+      particles = [];
+      updateHud();
+    }
+
+    function updateHud() {
+      distanceDisplay.textContent = `${Math.floor(distance).toLocaleString()} m`;
+      runCoinsDisplay.textContent = runCoins.toLocaleString();
+      totalCoinsDisplay.textContent = totalCoins.toLocaleString();
+      bestDisplay.textContent = `${bestDistance.toLocaleString()} m`;
+    }
+
+    function showOverlay(icon, title, message, buttonLabel, showInstructions = false) {
+      panelIcon.textContent = icon;
+      panelTitle.textContent = title;
+      panelMessage.textContent = message;
+      actionButton.textContent = buttonLabel;
+      instructions.hidden = !showInstructions;
+      overlay.classList.add("visible");
+    }
+
+    function hideOverlay() {
+      overlay.classList.remove("visible");
+    }
+
+    function startGame() {
+      initializeAudio();
+      resetGame();
+      state = "running";
+      hideOverlay();
+      lastFrameTime = performance.now();
+    }
+
+    function finishGame() {
+      if (state !== "running") return;
+      state = "gameover";
+      const finalDistance = Math.floor(distance);
+      const newBest = finalDistance > bestDistance;
+      if (newBest) bestDistance = finalDistance;
+      saveProgress();
+      playTone(145, 0.25, "sawtooth", 0.08);
+      playTone(90, 0.4, "sine", 0.08, 0.18);
+      vibrate([70, 40, 90]);
+      showOverlay(
+        "🏛️",
+        "Run Ended!",
+        `${finalDistance.toLocaleString()} m · ${runCoins.toLocaleString()} coins collected.${newBest ? " New distance record!" : ` Best: ${bestDistance.toLocaleString()} m.`}`,
+        "Run Again"
+      );
+    }
+
+    function moveLeft() {
+      if (state !== "running") return;
+      lane = Math.max(-1, lane - 1);
+      playTone(280, 0.04, "triangle", 0.025);
+      vibrate(8);
+    }
+
+    function moveRight() {
+      if (state !== "running") return;
+      lane = Math.min(1, lane + 1);
+      playTone(330, 0.04, "triangle", 0.025);
+      vibrate(8);
+    }
+
+    function jump() {
+      if (state !== "running" || jumpHeight > 1 || slideTimer > 0) return;
+      jumpVelocity = 525;
+      playTone(470, 0.08, "sine", 0.035);
+      vibrate(10);
+    }
+
+    function slide() {
+      if (state !== "running" || jumpHeight > 6) return;
+      slideTimer = 0.75;
+      playTone(210, 0.07, "triangle", 0.03);
+      vibrate(10);
+    }
+
+    function addCoinTrail(targetLane, startProgress = -0.12, amount = 5) {
+      for (let index = 0; index < amount; index += 1) {
+        objects.push({
+          kind: "coin",
+          lane: targetLane,
+          progress: startProgress - index * 0.075,
+          handled: false,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function spawnPattern() {
+      const obstacleTypes = ["barrier", "arch", "rock"];
+      const safeLane = randomLane();
+      const roll = Math.random();
+
+      if (roll < 0.56) {
+        const blockedLane = randomLane();
+        objects.push({ kind: "obstacle", type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)], lane: blockedLane, progress: -0.08, handled: false });
+        const coinLane = blockedLane === safeLane ? (safeLane === 1 ? 0 : safeLane + 1) : safeLane;
+        addCoinTrail(coinLane, -0.18, 5);
+      } else if (roll < 0.84) {
+        const blockedLanes = [-1, 0, 1].filter((item) => item !== safeLane);
+        for (const blockedLane of blockedLanes) {
+          objects.push({ kind: "obstacle", type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)], lane: blockedLane, progress: -0.08, handled: false });
+        }
+        addCoinTrail(safeLane, -0.16, 6);
+      } else {
+        addCoinTrail(safeLane, -0.1, 8);
+      }
+
+      if (Math.random() < 0.13) {
+        const types = ["shield", "magnet", "double"];
+        objects.push({ kind: "power", type: types[Math.floor(Math.random() * types.length)], lane: safeLane, progress: -0.52, handled: false, phase: 0 });
+      }
+
+      spawnTimer = Math.max(0.82, 1.35 - speed * 1.25);
+    }
+
+    function createBurst(x, y, color, amount = 9) {
+      for (let index = 0; index < amount; index += 1) {
+        const angle = Math.random() * Math.PI * 2;
+        const particleSpeed = randomBetween(30, 115);
+        particles.push({
+          x,
+          y,
+          velocityX: Math.cos(angle) * particleSpeed,
+          velocityY: Math.sin(angle) * particleSpeed,
+          radius: randomBetween(1.5, 4),
+          color,
+          life: randomBetween(0.3, 0.68),
+          maximumLife: 0.68
+        });
+      }
+    }
+
+    function collectCoin(object) {
+      if (object.handled) return;
+      object.handled = true;
+      const multiplier = gameTime < doubleUntil ? 2 : 1;
+      runCoins += multiplier;
+      totalCoins += multiplier;
+      const x = laneX(object.lane, object.progress);
+      const y = projectedY(object.progress);
+      createBurst(x, y, "#ffd35b", 8);
+      playTone(820 + (runCoins % 4) * 55, 0.055, "sine", 0.035);
+      saveProgress();
+      updateHud();
+    }
+
+    function collectPower(object) {
+      if (object.handled) return;
+      object.handled = true;
+      if (object.type === "shield") {
+        shield = true;
+        playTone(520, 0.14, "sine", 0.05);
+      } else if (object.type === "magnet") {
+        magnetUntil = gameTime + 9;
+        playTone(650, 0.12, "square", 0.045);
+      } else {
+        doubleUntil = gameTime + 9;
+        playTone(760, 0.12, "sine", 0.05);
+      }
+      const x = laneX(object.lane, object.progress);
+      const y = projectedY(object.progress);
+      createBurst(x, y, object.type === "shield" ? "#62eaff" : object.type === "magnet" ? "#ff6da9" : "#c8ff69", 14);
+      vibrate(18);
+    }
+
+    function obstacleAvoided(object) {
+      if (object.type === "barrier") return jumpHeight > 34;
+      if (object.type === "arch") return slideTimer > 0.08;
+      return jumpHeight > 56;
+    }
+
+    function hitObstacle(object) {
+      if (object.handled) return;
+      object.handled = true;
+      const x = laneX(object.lane, object.progress);
+      const y = projectedY(object.progress);
+
+      if (shield) {
+        shield = false;
+        createBurst(x, y, "#64edff", 20);
+        playTone(620, 0.18, "sine", 0.07);
+        vibrate([25, 20, 25]);
+        return;
+      }
+
+      createBurst(x, y, "#ff765f", 22);
+      finishGame();
+    }
+
+    function updateObjects(deltaTime) {
+      for (let index = objects.length - 1; index >= 0; index -= 1) {
+        const object = objects[index];
+        object.progress += speed * deltaTime;
+        object.phase = (object.phase || 0) + deltaTime * 5;
+
+        if (object.kind === "coin" && !object.handled) {
+          const magnetActive = gameTime < magnetUntil;
+          if ((object.lane === lane && object.progress >= 0.79) || (magnetActive && object.progress >= 0.55)) {
+            collectCoin(object);
+          }
+        } else if (object.kind === "power" && !object.handled && object.lane === lane && object.progress >= 0.79) {
+          collectPower(object);
+        } else if (object.kind === "obstacle" && !object.handled && object.lane === lane && object.progress >= 0.82) {
+          if (obstacleAvoided(object)) {
+            object.handled = true;
+            distance += 8;
+          } else {
+            hitObstacle(object);
+            if (state !== "running") return;
+          }
+        }
+
+        if (object.progress > 1.08 || object.handled && object.progress > 0.94) {
+          objects.splice(index, 1);
+        }
+      }
+    }
+
+    function updateParticles(deltaTime) {
+      for (let index = particles.length - 1; index >= 0; index -= 1) {
+        const particle = particles[index];
+        particle.life -= deltaTime;
+        particle.x += particle.velocityX * deltaTime;
+        particle.y += particle.velocityY * deltaTime;
+        particle.velocityX *= 0.98;
+        particle.velocityY *= 0.98;
+        if (particle.life <= 0) particles.splice(index, 1);
+      }
+    }
+
+    function update(deltaTime) {
+      gameTime += deltaTime;
+      speed = Math.min(0.34, 0.185 + distance / 18000);
+      distance += speed * deltaTime * 155;
+      sceneryOffset = (sceneryOffset + speed * deltaTime * 210) % 58;
+      visualLane += (lane - visualLane) * Math.min(1, deltaTime * 12);
+      slideTimer = Math.max(0, slideTimer - deltaTime);
+
+      if (jumpHeight > 0 || jumpVelocity > 0) {
+        jumpHeight += jumpVelocity * deltaTime;
+        jumpVelocity -= 1320 * deltaTime;
+        if (jumpHeight < 0) {
+          jumpHeight = 0;
+          jumpVelocity = 0;
+        }
+      }
+
+      spawnTimer -= deltaTime;
+      if (spawnTimer <= 0) spawnPattern();
+      updateObjects(deltaTime);
+      updateParticles(deltaTime);
+      updateHud();
+    }
+
+    function roundedRectangle(x, y, width, height, radius) {
+      const safeRadius = Math.min(radius, width / 2, height / 2);
+      context.beginPath();
+      context.moveTo(x + safeRadius, y);
+      context.lineTo(x + width - safeRadius, y);
+      context.arcTo(x + width, y, x + width, y + safeRadius, safeRadius);
+      context.lineTo(x + width, y + height - safeRadius);
+      context.arcTo(x + width, y + height, x + width - safeRadius, y + height, safeRadius);
+      context.lineTo(x + safeRadius, y + height);
+      context.arcTo(x, y + height, x, y + height - safeRadius, safeRadius);
+      context.lineTo(x, y + safeRadius);
+      context.arcTo(x, y, x + safeRadius, y, safeRadius);
+      context.closePath();
+    }
+
+    function drawWorld() {
+      const sky = context.createLinearGradient(0, 0, 0, HEIGHT);
+      sky.addColorStop(0, "#63c7c4");
+      sky.addColorStop(0.34, "#b8dd8a");
+      sky.addColorStop(0.35, "#567948");
+      sky.addColorStop(1, "#203d2f");
+      context.fillStyle = sky;
+      context.fillRect(0, 0, WIDTH, HEIGHT);
+
+      context.fillStyle = "rgba(255, 232, 145, 0.8)";
+      context.beginPath();
+      context.arc(310, 92, 35, 0, Math.PI * 2);
+      context.fill();
+
+      context.fillStyle = "#345e45";
+      context.beginPath();
+      context.moveTo(0, HORIZON_Y + 35);
+      context.lineTo(65, 76);
+      context.lineTo(125, HORIZON_Y + 30);
+      context.lineTo(205, 68);
+      context.lineTo(285, HORIZON_Y + 32);
+      context.lineTo(350, 85);
+      context.lineTo(WIDTH, HORIZON_Y + 25);
+      context.lineTo(WIDTH, 230);
+      context.lineTo(0, 230);
+      context.closePath();
+      context.fill();
+
+      context.fillStyle = "#172d26";
+      context.beginPath();
+      context.moveTo(WIDTH / 2 - 48, HORIZON_Y);
+      context.lineTo(WIDTH / 2 + 48, HORIZON_Y);
+      context.lineTo(WIDTH / 2 + 210, HEIGHT);
+      context.lineTo(WIDTH / 2 - 210, HEIGHT);
+      context.closePath();
+      context.fill();
+
+      context.strokeStyle = "rgba(246, 225, 160, 0.22)";
+      context.lineWidth = 3;
+      for (const divider of [-0.5, 0.5]) {
+        context.beginPath();
+        context.moveTo(WIDTH / 2 + divider * 48, HORIZON_Y);
+        context.lineTo(WIDTH / 2 + divider * 210, HEIGHT);
+        context.stroke();
+      }
+
+      for (let index = -1; index < 12; index += 1) {
+        const progress = ((index * 58 + sceneryOffset) % 696) / 696;
+        const y = HORIZON_Y + progress * (HEIGHT - HORIZON_Y);
+        const half = roadHalfWidth(progress);
+        context.strokeStyle = `rgba(245, 225, 174, ${0.08 + progress * 0.12})`;
+        context.lineWidth = 1 + progress * 3;
+        context.beginPath();
+        context.moveTo(WIDTH / 2 - half, y);
+        context.lineTo(WIDTH / 2 + half, y);
+        context.stroke();
+      }
+
+      drawJungleSides();
+    }
+
+    function drawJungleSides() {
+      for (let side = -1; side <= 1; side += 2) {
+        for (let index = 0; index < 5; index += 1) {
+          const y = 180 + index * 105 - sceneryOffset * 0.35;
+          const x = side < 0 ? 28 + (index % 2) * 9 : WIDTH - 28 - (index % 2) * 9;
+          const size = 18 + index * 3;
+          context.fillStyle = "#173729";
+          context.fillRect(x - 4, y, 8, size * 1.7);
+          context.fillStyle = index % 2 ? "#3d7d48" : "#4b914f";
+          context.beginPath();
+          context.arc(x, y, size, 0, Math.PI * 2);
+          context.fill();
+        }
+      }
+    }
+
+    function drawObstacle(object, x, y, scale) {
+      context.save();
+      context.translate(x, y);
+      context.scale(scale, scale);
+      if (object.type === "barrier") {
+        context.fillStyle = "#a96732";
+        context.strokeStyle = "#50321f";
+        context.lineWidth = 4;
+        roundedRectangle(-31, -18, 62, 34, 7);
+        context.fill();
+        context.stroke();
+        context.strokeStyle = "#ffd266";
+        context.lineWidth = 6;
+        context.beginPath();
+        context.moveTo(-22, -9);
+        context.lineTo(-8, 8);
+        context.moveTo(0, -9);
+        context.lineTo(14, 8);
+        context.stroke();
+      } else if (object.type === "arch") {
+        context.fillStyle = "#75644b";
+        context.strokeStyle = "#3e362b";
+        context.lineWidth = 4;
+        roundedRectangle(-35, -62, 14, 78, 5);
+        context.fill();
+        context.stroke();
+        roundedRectangle(21, -62, 14, 78, 5);
+        context.fill();
+        context.stroke();
+        roundedRectangle(-38, -64, 76, 22, 6);
+        context.fill();
+        context.stroke();
+      } else {
+        context.fillStyle = "#6d746d";
+        context.strokeStyle = "#363d38";
+        context.lineWidth = 4;
+        context.beginPath();
+        context.moveTo(-29, 13);
+        context.lineTo(-22, -17);
+        context.lineTo(-2, -29);
+        context.lineTo(24, -15);
+        context.lineTo(30, 14);
+        context.closePath();
+        context.fill();
+        context.stroke();
+        context.strokeStyle = "#90978d";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(-14, -13);
+        context.lineTo(5, -20);
+        context.stroke();
+      }
+      context.restore();
+    }
+
+    function drawCoin(object, x, y, scale) {
+      context.save();
+      context.translate(x, y - 13 * scale + Math.sin(object.phase) * 3 * scale);
+      context.scale(scale, scale);
+      context.fillStyle = "#ffd34f";
+      context.strokeStyle = "#b36c18";
+      context.lineWidth = 3;
+      context.shadowColor = "#ffc12f";
+      context.shadowBlur = 9;
+      context.beginPath();
+      context.arc(0, 0, 11, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+      context.shadowBlur = 0;
+      context.fillStyle = "#8b5717";
+      context.font = "900 11px system-ui";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText("★", 0, 1);
+      context.restore();
+    }
+
+    function drawPower(object, x, y, scale) {
+      const symbols = { shield: "◆", magnet: "U", double: "2×" };
+      const colors = { shield: "#62eaff", magnet: "#ff6ca8", double: "#b9f568" };
+      context.save();
+      context.translate(x, y - 15 * scale + Math.sin(object.phase) * 3 * scale);
+      context.scale(scale, scale);
+      context.fillStyle = colors[object.type];
+      context.shadowColor = colors[object.type];
+      context.shadowBlur = 12;
+      context.beginPath();
+      context.arc(0, 0, 15, 0, Math.PI * 2);
+      context.fill();
+      context.shadowBlur = 0;
+      context.fillStyle = "#21362d";
+      context.font = "950 12px system-ui";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(symbols[object.type], 0, 1);
+      context.restore();
+    }
+
+    function drawObjects() {
+      const visible = objects
+        .filter((object) => object.progress > 0 && !object.handled)
+        .sort((first, second) => first.progress - second.progress);
+      for (const object of visible) {
+        const x = laneX(object.lane, object.progress);
+        const y = projectedY(object.progress);
+        const scale = 0.26 + object.progress * 0.9;
+        if (object.kind === "obstacle") drawObstacle(object, x, y, scale);
+        else if (object.kind === "coin") drawCoin(object, x, y, scale);
+        else drawPower(object, x, y, scale);
+      }
+    }
+
+    function drawRunner() {
+      const x = laneX(visualLane, 0.84);
+      const y = PLAYER_Y - jumpHeight;
+      const sliding = slideTimer > 0;
+      context.save();
+      context.translate(x, y);
+      context.scale(1, sliding ? 0.58 : 1);
+
+      context.save();
+      context.scale(1, sliding ? 1.65 : 1);
+      context.globalAlpha = 0.28;
+      context.fillStyle = "#07130f";
+      context.beginPath();
+      context.ellipse(0, 34 + jumpHeight * 0.7, 23, 8, 0, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+
+      if (shield) {
+        context.strokeStyle = "#69efff";
+        context.lineWidth = 4;
+        context.shadowColor = "#69efff";
+        context.shadowBlur = 11;
+        context.beginPath();
+        context.arc(0, 0, 31 + Math.sin(gameTime * 6) * 2, 0, Math.PI * 2);
+        context.stroke();
+        context.shadowBlur = 0;
+      }
+
+      const stride = Math.sin(gameTime * (9 + speed * 25)) * 8;
+      context.strokeStyle = "#2e4051";
+      context.lineWidth = 8;
+      context.lineCap = "round";
+      context.beginPath();
+      context.moveTo(-7, 16);
+      context.lineTo(-9 + stride, 35);
+      context.moveTo(7, 16);
+      context.lineTo(9 - stride, 35);
+      context.stroke();
+
+      context.fillStyle = "#e88a3c";
+      context.strokeStyle = "#713b27";
+      context.lineWidth = 3;
+      roundedRectangle(-15, -12, 30, 34, 10);
+      context.fill();
+      context.stroke();
+
+      context.strokeStyle = "#dca06e";
+      context.lineWidth = 7;
+      context.beginPath();
+      context.moveTo(-13, -3);
+      context.lineTo(-23 - stride * 0.5, 11);
+      context.moveTo(13, -3);
+      context.lineTo(23 + stride * 0.5, 11);
+      context.stroke();
+
+      context.fillStyle = "#dca06e";
+      context.beginPath();
+      context.arc(0, -24, 12, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "#402c25";
+      context.beginPath();
+      context.arc(0, -28, 11, Math.PI, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "#fff";
+      context.beginPath();
+      context.arc(-4, -23, 2, 0, Math.PI * 2);
+      context.arc(4, -23, 2, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+    }
+
+    function drawParticles() {
+      context.save();
+      for (const particle of particles) {
+        context.globalAlpha = clamp(particle.life / particle.maximumLife, 0, 1);
+        context.fillStyle = particle.color;
+        context.beginPath();
+        context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.restore();
+    }
+
+    function drawStatus() {
+      const statuses = [];
+      if (shield) statuses.push("◆ SHIELD");
+      if (gameTime < magnetUntil) statuses.push(`U ${Math.ceil(magnetUntil - gameTime)}s`);
+      if (gameTime < doubleUntil) statuses.push(`2× ${Math.ceil(doubleUntil - gameTime)}s`);
+      if (statuses.length === 0) return;
+      context.font = "900 11px ui-rounded, system-ui";
+      context.textAlign = "center";
+      const label = statuses.join("   ");
+      const width = context.measureText(label).width + 22;
+      roundedRectangle(WIDTH / 2 - width / 2, HEIGHT - 39, width, 25, 10);
+      context.fillStyle = "rgba(9, 33, 25, 0.82)";
+      context.fill();
+      context.fillStyle = "#efffe8";
+      context.textBaseline = "middle";
+      context.fillText(label, WIDTH / 2, HEIGHT - 26);
+    }
+
+    function draw() {
+      drawWorld();
+      drawObjects();
+      drawRunner();
+      drawParticles();
+      drawStatus();
+    }
+
+    function gameLoop(timestamp) {
+      const deltaTime = Math.min(0.034, Math.max(0, (timestamp - lastFrameTime) / 1000 || 0));
+      lastFrameTime = timestamp;
+      if (state === "running") update(deltaTime);
+      else updateParticles(deltaTime);
+      draw();
+      window.requestAnimationFrame(gameLoop);
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      if (state !== "running") return;
+      swipeStart = { x: event.clientX, y: event.clientY };
+      canvas.setPointerCapture(event.pointerId);
+      initializeAudio();
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("pointerup", (event) => {
+      if (!swipeStart || state !== "running") return;
+      const xDistance = event.clientX - swipeStart.x;
+      const yDistance = event.clientY - swipeStart.y;
+      const horizontal = Math.abs(xDistance) > Math.abs(yDistance);
+      if (horizontal && Math.abs(xDistance) > 28) {
+        xDistance < 0 ? moveLeft() : moveRight();
+      } else if (!horizontal && Math.abs(yDistance) > 28) {
+        yDistance < 0 ? jump() : slide();
+      } else {
+        jump();
+      }
+      swipeStart = null;
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("pointercancel", () => {
+      swipeStart = null;
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") moveLeft();
+      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") moveRight();
+      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w" || event.key === " ") jump();
+      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") slide();
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) event.preventDefault();
+    });
+
+    leftButton.addEventListener("click", moveLeft);
+    rightButton.addEventListener("click", moveRight);
+    jumpButton.addEventListener("click", jump);
+    slideButton.addEventListener("click", slide);
+
+    actionButton.addEventListener("click", () => {
+      if (state === "paused") {
+        state = "running";
+        hideOverlay();
+        lastFrameTime = performance.now();
+      } else {
+        startGame();
+      }
+    });
+
+    soundButton.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+      soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
+      saveProgress();
+      if (soundEnabled) {
+        initializeAudio();
+        playTone(620, 0.12, "sine", 0.05);
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && state === "running") {
+        state = "paused";
+        showOverlay("⏸️", "Run Paused", `${Math.floor(distance).toLocaleString()} m traveled.`, "Keep Running");
+      }
+    });
+
+    window.addEventListener("resize", configureCanvas);
+
+    configureCanvas();
+    resetGame();
+    state = "start";
+    soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+    soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
+    showOverlay(
+      "🏃",
+      "Ruins Rush",
+      `Race through original jungle ruins. Best: ${bestDistance.toLocaleString()} m · Coins: ${totalCoins.toLocaleString()}.`,
+      "Start Running",
+      true
+    );
+    window.requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

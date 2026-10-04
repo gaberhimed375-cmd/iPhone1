@@ -1,12 +1,13 @@
 "use strict";
 
-const CACHE_NAME = "pocket-arcade-v6";
+const CACHE_NAME = "pocket-arcade-v7";
 const APP_FILES = [
   "./",
   "./index.html",
   "./matching.html",
   "./shooter.html",
   "./zombie.html",
+  "./runner.html",
   "./manifest.webmanifest",
   "./register-sw.js",
   "./icon.svg"

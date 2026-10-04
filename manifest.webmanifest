@@ -1,13 +1,14 @@
 {
+  "id": "./",
   "name": "Pocket Arcade",
   "short_name": "Arcade",
-  "description": "A colorful pocket arcade with matching, space, puzzle, and endless runner games.",
+  "description": "Four polished touch-first games: memory matching, space survival, path puzzles, and endless running.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#11183f",
-  "theme_color": "#5b52e8",
+  "background_color": "#070a15",
+  "theme_color": "#080b18",
   "categories": ["games", "entertainment"],
   "icons": [
     {
@@ -15,6 +16,32 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Critter Match",
+      "short_name": "Match",
+      "description": "Play the memory matching game",
+      "url": "matching.html"
+    },
+    {
+      "name": "Star Defender",
+      "short_name": "Defender",
+      "description": "Play the space survival game",
+      "url": "shooter.html"
+    },
+    {
+      "name": "Zombie Escape",
+      "short_name": "Escape",
+      "description": "Play the path puzzle game",
+      "url": "zombie.html"
+    },
+    {
+      "name": "Ruins Rush",
+      "short_name": "Rush",
+      "description": "Play the endless runner game",
+      "url": "runner.html"
     }
   ]
 }

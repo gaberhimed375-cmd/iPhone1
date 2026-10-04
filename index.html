@@ -3,385 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#5b52e8">
+  <meta name="description" content="Pocket Arcade is a collection of four polished, touch-first games that work online and offline.">
+  <meta name="theme-color" content="#080b18">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Pocket Arcade">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="arcade.css">
   <script src="register-sw.js" defer></script>
-  <title>Pocket Arcade</title>
-
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #302c4d;
-      --muted: #6f698f;
-      --purple: #6c63ff;
-      --purple-dark: #4840c8;
-      --pink: #ff6fae;
-      --blue: #29b6f6;
-      --white: #fff;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html,
-    body {
-      min-height: 100%;
-      margin: 0;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      padding: max(24px, env(safe-area-inset-top)) 18px max(30px, env(safe-area-inset-bottom));
-      color: var(--ink);
-      font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", system-ui, sans-serif;
-      background:
-        radial-gradient(circle at 8% 8%, rgba(255, 255, 255, 0.75) 0 4%, transparent 4.5%),
-        radial-gradient(circle at 92% 15%, rgba(255, 221, 103, 0.85) 0 7%, transparent 7.5%),
-        linear-gradient(155deg, #9ce9ff 0%, #d8c8ff 50%, #ffc3df 100%);
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    main {
-      width: min(100%, 520px);
-    }
-
-    .brand {
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    .logo {
-      display: inline-grid;
-      place-items: center;
-      width: 78px;
-      height: 78px;
-      margin-bottom: 8px;
-      border: 5px solid var(--white);
-      border-radius: 26px;
-      background: linear-gradient(145deg, var(--purple), var(--pink));
-      box-shadow: 0 9px 0 rgba(72, 64, 200, 0.55);
-      font-size: 2.6rem;
-      transform: rotate(-4deg);
-    }
-
-    h1 {
-      margin: 8px 0 3px;
-      color: var(--white);
-      font-size: clamp(2.4rem, 12vw, 4rem);
-      line-height: 0.95;
-      letter-spacing: -0.05em;
-      text-shadow: 0 5px 0 var(--purple-dark);
-    }
-
-    .tagline {
-      margin: 12px 0 0;
-      color: #494268;
-      font-weight: 900;
-    }
-
-    .section-title {
-      margin: 0 0 12px 4px;
-      font-size: 0.82rem;
-      font-weight: 950;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .games {
-      display: grid;
-      gap: 17px;
-    }
-
-    .game-card {
-      position: relative;
-      display: grid;
-      grid-template-columns: 96px 1fr auto;
-      align-items: center;
-      min-height: 132px;
-      padding: 15px;
-      overflow: hidden;
-      border: 4px solid var(--white);
-      border-radius: 28px;
-      color: var(--ink);
-      box-shadow: 0 9px 0 rgba(48, 44, 77, 0.22);
-      text-decoration: none;
-      touch-action: manipulation;
-      transition: transform 150ms ease, box-shadow 150ms ease;
-    }
-
-    .game-card:active {
-      box-shadow: 0 4px 0 rgba(48, 44, 77, 0.22);
-      transform: translateY(5px) scale(0.99);
-    }
-
-    .matching {
-      background: linear-gradient(135deg, #fff6bf, #ffd1e5);
-    }
-
-    .shooter {
-      color: var(--white);
-      background:
-        radial-gradient(circle at 80% 18%, #fff 0 2px, transparent 3px),
-        radial-gradient(circle at 67% 72%, #fff 0 1.5px, transparent 2.5px),
-        radial-gradient(circle at 25% 25%, #88e8ff 0 2px, transparent 3px),
-        linear-gradient(145deg, #1d245c, #5b36a5 58%, #d54f98);
-    }
-
-    .zombie {
-      color: var(--white);
-      background:
-        radial-gradient(circle at 86% 22%, rgba(171, 255, 121, 0.24) 0 8%, transparent 9%),
-        radial-gradient(circle at 18% 78%, rgba(255, 194, 91, 0.18) 0 12%, transparent 13%),
-        linear-gradient(145deg, #162b29, #315e45 55%, #50334f);
-    }
-
-    .runner {
-      color: var(--white);
-      background:
-        radial-gradient(circle at 83% 17%, rgba(255, 221, 106, 0.32) 0 9%, transparent 10%),
-        radial-gradient(circle at 14% 80%, rgba(133, 233, 105, 0.2) 0 13%, transparent 14%),
-        linear-gradient(145deg, #163a2d, #477444 55%, #8c5638);
-    }
-
-    .game-icon {
-      display: grid;
-      place-items: center;
-      width: 82px;
-      height: 92px;
-      border: 4px solid rgba(255, 255, 255, 0.92);
-      border-radius: 23px;
-      background: rgba(255, 255, 255, 0.62);
-      box-shadow: 0 6px 0 rgba(48, 44, 77, 0.16);
-      font-size: 2.75rem;
-    }
-
-    .shooter .game-icon {
-      background: rgba(50, 232, 255, 0.15);
-    }
-
-    .zombie .game-icon {
-      background: rgba(145, 236, 98, 0.17);
-    }
-
-    .runner .game-icon {
-      background: rgba(255, 213, 91, 0.18);
-    }
-
-    .game-copy {
-      min-width: 0;
-      padding: 0 11px;
-    }
-
-    .game-copy h2 {
-      margin: 0 0 6px;
-      font-size: clamp(1.22rem, 5.7vw, 1.65rem);
-      line-height: 1;
-    }
-
-    .game-copy p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 800;
-      line-height: 1.35;
-    }
-
-    .shooter .game-copy p,
-    .zombie .game-copy p,
-    .runner .game-copy p {
-      color: #dce4ff;
-    }
-
-    .best {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.65);
-      color: #5d577b;
-      font-size: 0.65rem;
-      font-weight: 950;
-    }
-
-    .shooter .best {
-      background: rgba(42, 231, 255, 0.18);
-      color: #dffcff;
-    }
-
-    .zombie .best {
-      background: rgba(151, 239, 108, 0.17);
-      color: #eaffdf;
-    }
-
-    .runner .best {
-      background: rgba(255, 215, 93, 0.2);
-      color: #fff3c4;
-    }
-
-    .play {
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      color: var(--white);
-      background: var(--purple);
-      box-shadow: 0 4px 0 var(--purple-dark);
-      font-size: 1.15rem;
-    }
-
-    .shooter .play {
-      color: #18204e;
-      background: #57edff;
-      box-shadow: 0 4px 0 #1a9eb6;
-    }
-
-    .zombie .play {
-      color: #183520;
-      background: #9af06d;
-      box-shadow: 0 4px 0 #3f944b;
-    }
-
-    .runner .play {
-      color: #4b3211;
-      background: #ffd35c;
-      box-shadow: 0 4px 0 #a96d1d;
-    }
-
-    footer {
-      margin-top: 24px;
-      color: #5d577b;
-      font-size: 0.75rem;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    @media (max-width: 370px) {
-      .game-card {
-        grid-template-columns: 78px 1fr auto;
-        padding: 12px;
-      }
-
-      .game-icon {
-        width: 68px;
-        height: 82px;
-        font-size: 2.25rem;
-      }
-
-      .game-copy {
-        padding: 0 8px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        transition: none !important;
-      }
-    }
-  </style>
+  <script src="arcade-ui.js" defer></script>
+  <title>Pocket Arcade — Four Games, One Pocket</title>
 </head>
-<body>
-  <main>
-    <header class="brand">
-      <div class="logo" aria-hidden="true">🎮</div>
-      <h1>Pocket Arcade</h1>
-      <p class="tagline">Pick a game. Chase a high score.</p>
-    </header>
-
-    <h2 class="section-title">Choose your game</h2>
-
-    <nav class="games" aria-label="Available games">
-      <a class="game-card matching" href="matching.html">
-        <div class="game-icon" aria-hidden="true">🐶</div>
-        <div class="game-copy">
-          <h2>Critter Match</h2>
-          <p>Flip cards and find every cartoon animal pair.</p>
-          <span class="best" id="match-best">Best: —</span>
-        </div>
-        <span class="play" aria-hidden="true">▶</span>
-      </a>
-
-      <a class="game-card shooter" href="shooter.html">
-        <div class="game-icon" aria-hidden="true">🚀</div>
-        <div class="game-copy">
-          <h2>Star Defender</h2>
-          <p>Drag to fly, blast aliens, and survive every wave.</p>
-          <span class="best" id="shooter-best">High score: 0</span>
-        </div>
-        <span class="play" aria-hidden="true">▶</span>
-      </a>
-
-      <a class="game-card zombie" href="zombie.html">
-        <div class="game-icon" aria-hidden="true">🧟</div>
-        <div class="game-copy">
-          <h2>Zombie Escape</h2>
-          <p>Rotate roads, unlock survivor gear, and find the exit.</p>
-          <span class="best" id="zombie-best">Level 1 · 🪙 0</span>
-        </div>
-        <span class="play" aria-hidden="true">▶</span>
-      </a>
-
-      <a class="game-card runner" href="runner.html">
-        <div class="game-icon" aria-hidden="true">🏃</div>
-        <div class="game-copy">
-          <h2>Ruins Rush</h2>
-          <p>Swipe through jungle ruins, dodge traps, and collect coins.</p>
-          <span class="best" id="runner-best">Best: 0 m · 🪙 0</span>
-        </div>
-        <span class="play" aria-hidden="true">▶</span>
-      </a>
+<body data-theme="home">
+  <main class="arcade-home">
+    <nav class="home-nav" aria-label="Pocket Arcade status">
+      <div class="mini-brand">
+        <span class="mini-brand-mark" aria-hidden="true">✦</span>
+        <span>Pocket Arcade</span>
+      </div>
+      <div class="connection-pill">
+        <span class="connection-dot" aria-hidden="true"></span>
+        <span>Offline ready</span>
+      </div>
     </nav>
 
-    <footer>Four games · Touch controls · Plays offline after loading</footer>
+    <header class="home-hero">
+      <span class="eyebrow">Season 01 · Four original games</span>
+      <h1>Big play.<br><span class="gradient-word">Small screen.</span></h1>
+      <p class="hero-copy">
+        A touch-first arcade built for quick runs, clever puzzles, high scores, and offline play. No downloads, no accounts—just pick a game and start.
+      </p>
+      <div class="hero-stats" aria-label="Arcade features">
+        <span class="hero-stat">🎮 4 games</span>
+        <span class="hero-stat">☝️ Touch optimized</span>
+        <span class="hero-stat">⚡ Instant loading</span>
+        <span class="hero-stat">☁️ Plays offline</span>
+      </div>
+    </header>
+
+    <section class="games-section" aria-labelledby="games-title">
+      <div class="section-heading">
+        <h2 id="games-title">Choose your game</h2>
+        <p>Progress saves on this device</p>
+      </div>
+
+      <nav class="games" aria-label="Available games">
+        <a class="game-card matching" href="matching.html">
+          <div class="game-icon" aria-hidden="true">🐶</div>
+          <div class="game-copy">
+            <span class="game-genre">Memory · Relaxed</span>
+            <h2>Critter Match</h2>
+            <p>Flip the deck, remember each critter, and clear all eight pairs in the fewest moves.</p>
+            <div class="card-footer">
+              <span class="best" id="match-best">No record yet</span>
+              <span class="play" aria-hidden="true">PLAY →</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="game-card shooter" href="shooter.html">
+          <div class="game-icon" aria-hidden="true">🚀</div>
+          <div class="game-copy">
+            <span class="game-genre">Action · Survival</span>
+            <h2>Star Defender</h2>
+            <p>Fly through alien waves, defeat massive bosses, and unlock ship and laser cosmetics.</p>
+            <div class="card-footer">
+              <span class="best" id="shooter-best">Score 0 · 🪙 0</span>
+              <span class="play" aria-hidden="true">PLAY →</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="game-card zombie" href="zombie.html">
+          <div class="game-icon" aria-hidden="true">🧟</div>
+          <div class="game-copy">
+            <span class="game-genre">Puzzle · Strategy</span>
+            <h2>Zombie Escape</h2>
+            <p>Rotate roads, connect a safe route, and customize your survivor, weapon, and map.</p>
+            <div class="card-footer">
+              <span class="best" id="zombie-best">Level 1 · 🪙 0</span>
+              <span class="play" aria-hidden="true">PLAY →</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="game-card runner" href="runner.html">
+          <div class="game-icon" aria-hidden="true">🏃</div>
+          <div class="game-copy">
+            <span class="game-genre">Runner · Reflex</span>
+            <h2>Ruins Rush</h2>
+            <p>Swipe through jungle ruins, read the path ahead, chain combos, and chase distance records.</p>
+            <div class="card-footer">
+              <span class="best" id="runner-best">Best 0 m · 🪙 0</span>
+              <span class="play" aria-hidden="true">PLAY →</span>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </section>
+
+    <aside class="install-card" aria-label="Install Pocket Arcade">
+      <span class="install-icon" aria-hidden="true">↗</span>
+      <div>
+        <h2>Keep the arcade one tap away</h2>
+        <p>On iPhone, open Safari’s Share menu and choose <strong>Add to Home Screen</strong>. Your progress stays on this device.</p>
+      </div>
+    </aside>
+
+    <footer class="home-footer">
+      <span>Built for touch, keyboard, and offline play.</span>
+      <span>v1.0</span>
+    </footer>
   </main>
 
   <script>
     "use strict";
 
-    function loadScores() {
+    function readInteger(key) {
       try {
-        const matchScore = JSON.parse(localStorage.getItem("critter-match-best-v1"));
-        if (matchScore && Number.isInteger(matchScore.moves)) {
-          document.getElementById("match-best").textContent = `Best: ${matchScore.moves} moves`;
-        }
-
-        const shooterScore = Number.parseInt(localStorage.getItem("star-defender-best-v1"), 10);
-        const shooterCoins = Number.parseInt(localStorage.getItem("star-defender-coins-v1"), 10);
-        const safeScore = Number.isFinite(shooterScore) && shooterScore > 0 ? shooterScore : 0;
-        const safeCoins = Number.isFinite(shooterCoins) && shooterCoins > 0 ? shooterCoins : 0;
-        document.getElementById("shooter-best").textContent =
-          `High score: ${safeScore.toLocaleString()} · 🪙 ${safeCoins.toLocaleString()}`;
-
-        const zombieCoins = Number.parseInt(localStorage.getItem("zombie-escape-coins-v1"), 10);
-        const safeZombieCoins = Number.isFinite(zombieCoins) && zombieCoins > 0 ? zombieCoins : 0;
-        let zombieLevel = 1;
-        try {
-          const zombieProgress = JSON.parse(localStorage.getItem("zombie-puzzle-progress-v1"));
-          if (zombieProgress && Number.isInteger(zombieProgress.unlockedLevel)) {
-            zombieLevel = Math.max(1, Math.min(30, zombieProgress.unlockedLevel));
-          }
-        } catch (error) {
-          console.warn("Zombie puzzle progress could not be loaded.", error);
-        }
-        document.getElementById("zombie-best").textContent =
-          `Level ${zombieLevel} · 🪙 ${safeZombieCoins.toLocaleString()}`;
-
-        const runnerDistance = Number.parseInt(localStorage.getItem("ruins-rush-best-v1"), 10);
-        const runnerCoins = Number.parseInt(localStorage.getItem("ruins-rush-coins-v1"), 10);
-        const safeRunnerDistance = Number.isFinite(runnerDistance) && runnerDistance > 0 ? runnerDistance : 0;
-        const safeRunnerCoins = Number.isFinite(runnerCoins) && runnerCoins > 0 ? runnerCoins : 0;
-        document.getElementById("runner-best").textContent =
-          `Best: ${safeRunnerDistance.toLocaleString()} m · 🪙 ${safeRunnerCoins.toLocaleString()}`;
+        const value = Number.parseInt(localStorage.getItem(key), 10);
+        return Number.isFinite(value) && value >= 0 ? value : 0;
       } catch (error) {
-        console.warn("Saved scores could not be loaded.", error);
+        console.warn(`Could not read ${key}.`, error);
+        return 0;
       }
+    }
+
+    function readJson(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return value && typeof value === "object" ? value : fallback;
+      } catch (error) {
+        console.warn(`Could not read ${key}.`, error);
+        return fallback;
+      }
+    }
+
+    function loadScores() {
+      const matchScore = readJson("critter-match-best-v1", null);
+      document.getElementById("match-best").textContent =
+        matchScore && Number.isInteger(matchScore.moves)
+          ? `${matchScore.moves} moves · ${Math.floor(matchScore.time / 60)}:${String(matchScore.time % 60).padStart(2, "0")}`
+          : "No record yet";
+
+      const shooterScore = readInteger("star-defender-best-v1");
+      const shooterCoins = readInteger("star-defender-coins-v1");
+      document.getElementById("shooter-best").textContent =
+        `Score ${shooterScore.toLocaleString()} · 🪙 ${shooterCoins.toLocaleString()}`;
+
+      const zombieCoins = readInteger("zombie-escape-coins-v1");
+      const zombieProgress = readJson("zombie-puzzle-progress-v1", { unlockedLevel: 1 });
+      const zombieLevel = Number.isInteger(zombieProgress.unlockedLevel)
+        ? Math.max(1, Math.min(30, zombieProgress.unlockedLevel))
+        : 1;
+      document.getElementById("zombie-best").textContent =
+        `Level ${zombieLevel} · 🪙 ${zombieCoins.toLocaleString()}`;
+
+      const runnerDistance = readInteger("ruins-rush-best-v1");
+      const runnerCoins = readInteger("ruins-rush-coins-v1");
+      document.getElementById("runner-best").textContent =
+        `Best ${runnerDistance.toLocaleString()} m · 🪙 ${runnerCoins.toLocaleString()}`;
     }
 
     loadScores();

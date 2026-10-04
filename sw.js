@@ -1,6 +1,7 @@
 "use strict";
 
-const CACHE_NAME = "pocket-arcade-v8";
+const CACHE_PREFIX = "pocket-arcade-";
+const CACHE_NAME = `${CACHE_PREFIX}v9`;
 const APP_FILES = [
   "./",
   "./index.html",
@@ -8,10 +9,15 @@ const APP_FILES = [
   "./shooter.html",
   "./zombie.html",
   "./runner.html",
+  "./arcade.css",
+  "./arcade-ui.js",
   "./manifest.webmanifest",
   "./register-sw.js",
   "./icon.svg"
 ];
+const APP_PATHS = new Set(
+  APP_FILES.map((file) => new URL(file, self.registration.scope).pathname)
+);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -25,7 +31,9 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
       .then((names) => Promise.all(
-        names.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
+        names
+          .filter((name) => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
       ))
       .then(() => self.clients.claim())
   );
@@ -39,32 +47,43 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  const canonicalRequest = new Request(`${url.origin}${url.pathname}`);
+
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          if (response.ok && APP_PATHS.has(url.pathname)) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(canonicalRequest, copy));
+          }
           return response;
         })
-        .catch(() => caches.match(request).then((response) => response || caches.match("./index.html")))
+        .catch(async () => {
+          const exact = await caches.match(canonicalRequest);
+          return exact || caches.match("./index.html");
+        })
     );
     return;
   }
 
+  if (!APP_PATHS.has(url.pathname)) {
+    return;
+  }
+
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const networkResponse = fetch(request)
+    caches.match(canonicalRequest).then((cached) => {
+      const refreshed = fetch(request)
         .then((response) => {
           if (response.ok) {
             const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            caches.open(CACHE_NAME).then((cache) => cache.put(canonicalRequest, copy));
           }
           return response;
         })
-        .catch(() => cached);
+        .catch(() => cached || Response.error());
 
-      return cached || networkResponse;
+      return cached || refreshed;
     })
   );
 });

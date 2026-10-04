@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Pocket Arcade game controller">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6c63ff"/>
+      <stop offset="1" stop-color="#ff5ca8"/>
+    </linearGradient>
+    <linearGradient id="controller" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#c9f7ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#background)"/>
+  <circle cx="84" cy="92" r="16" fill="#ffd65a"/>
+  <circle cx="430" cy="112" r="10" fill="#75efff"/>
+  <path d="M142 182c34-34 194-34 228 0 32 33 69 147 37 177-28 27-70-19-101-47H206c-31 28-73 74-101 47-32-30 5-144 37-177Z" fill="url(#controller)" stroke="#302c4d" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M178 221v82M137 262h82" stroke="#5b52e8" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="337" cy="238" r="18" fill="#ff5ca8"/>
+  <circle cx="373" cy="276" r="18" fill="#ffd65a"/>
+  <circle cx="301" cy="276" r="18" fill="#62eeb4"/>
+  <circle cx="337" cy="314" r="18" fill="#58dfff"/>
+</svg>

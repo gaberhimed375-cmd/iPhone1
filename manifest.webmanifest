@@ -1,0 +1,20 @@
+{
+  "name": "Pocket Arcade",
+  "short_name": "Arcade",
+  "description": "A colorful pocket arcade with Critter Match and Star Defender.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#11183f",
+  "theme_color": "#5b52e8",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

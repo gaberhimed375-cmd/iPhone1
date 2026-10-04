@@ -63,9 +63,9 @@
 
     .topbar {
       display: grid;
-      grid-template-columns: 46px 1fr auto auto;
+      grid-template-columns: 46px 1fr auto auto auto;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       min-height: 54px;
       padding-bottom: 8px;
     }
@@ -281,6 +281,183 @@
       text-align: center;
     }
 
+    .coin-button {
+      width: auto;
+      min-width: 58px;
+      padding: 0 8px;
+      color: #3c2a09;
+      background: linear-gradient(145deg, #ffe982, #ffb82e);
+      border-color: #fff3ba;
+      font-size: 0.75rem;
+      box-shadow: 0 4px 0 #b56e10;
+    }
+
+    .shop-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      padding: 14px;
+      background: rgba(6, 9, 35, 0.86);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .shop-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .shop-panel {
+      width: 100%;
+      max-height: calc(100% - 12px);
+      overflow-y: auto;
+      padding: 17px;
+      border: 3px solid var(--yellow);
+      border-radius: 23px;
+      background: linear-gradient(155deg, #252963, #502875);
+      box-shadow: 0 8px 0 #10132f;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .shop-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+
+    .shop-header h2 {
+      margin: 0;
+      color: var(--yellow);
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .shop-header p {
+      margin: 5px 0 0;
+      color: #d9e2ff;
+      font-size: 0.7rem;
+      font-weight: 750;
+    }
+
+    .close-shop {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      border-radius: 12px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+      font-size: 1.1rem;
+      font-weight: 950;
+    }
+
+    .shop-balance {
+      margin-bottom: 15px;
+      padding: 9px 12px;
+      border-radius: 13px;
+      color: #3b2a0d;
+      background: linear-gradient(145deg, #ffed91, #ffc13c);
+      font-size: 0.86rem;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .shop-title {
+      margin: 13px 2px 8px;
+      color: #bfefff;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .shop-item {
+      min-height: 104px;
+      padding: 9px 7px;
+      border: 2px solid rgba(255, 255, 255, 0.28);
+      border-radius: 15px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.09);
+      text-align: center;
+    }
+
+    .shop-item.equipped {
+      border-color: #62ffc6;
+      background: rgba(74, 224, 171, 0.18);
+      box-shadow: inset 0 0 18px rgba(98, 255, 198, 0.15);
+    }
+
+    .shop-item.cannot-afford {
+      animation: shop-shake 260ms ease;
+      border-color: #ff6b9f;
+    }
+
+    .shop-preview {
+      display: grid;
+      place-items: center;
+      height: 37px;
+      font-size: 1.9rem;
+    }
+
+    .laser-preview {
+      width: 9px;
+      height: 34px;
+      border-radius: 99px;
+      background: var(--preview-color);
+      box-shadow: 0 0 12px var(--preview-glow);
+    }
+
+    .shop-item strong,
+    .shop-item small {
+      display: block;
+    }
+
+    .shop-item strong {
+      margin-top: 4px;
+      font-size: 0.77rem;
+    }
+
+    .shop-item small {
+      margin-top: 4px;
+      color: #d7ddff;
+      font-size: 0.62rem;
+      font-weight: 800;
+    }
+
+    @keyframes shop-shake {
+      0%, 100% { transform: translateX(0); }
+      33% { transform: translateX(-5px); }
+      66% { transform: translateX(5px); }
+    }
+
+    @media (max-width: 370px) {
+      .topbar {
+        grid-template-columns: 40px 1fr auto auto auto;
+        gap: 4px;
+      }
+
+      .game-name span {
+        display: none;
+      }
+
+      .coin-button {
+        min-width: 52px;
+        padding: 0 5px;
+      }
+    }
+
     @media (max-height: 720px) {
       .topbar {
         min-height: 46px;
@@ -315,6 +492,7 @@
         <strong>Star Defender</strong>
         <span>Cartoon Space Patrol</span>
       </div>
+      <button class="icon-button coin-button" id="shop-button" type="button" aria-label="Open coin shop">🪙 <span id="coin-balance">0</span></button>
       <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">🔊</button>
       <button class="icon-button" id="pause-button" type="button" aria-label="Pause game">Ⅱ</button>
     </header>
@@ -349,9 +527,26 @@
           <button class="primary-button" id="action-button" type="button">Start Mission</button>
         </div>
       </div>
+
+      <div class="shop-overlay" id="shop-overlay" role="dialog" aria-modal="true" aria-labelledby="shop-title">
+        <section class="shop-panel">
+          <header class="shop-header">
+            <div>
+              <h2 id="shop-title">Cosmic Shop</h2>
+              <p>Collect coins during missions to unlock cosmetics.</p>
+            </div>
+            <button class="close-shop" id="close-shop" type="button" aria-label="Close shop">✕</button>
+          </header>
+          <div class="shop-balance">🪙 <span id="shop-balance">0</span> coins available</div>
+          <h3 class="shop-title">Ship skins</h3>
+          <div class="shop-grid" id="skin-shop"></div>
+          <h3 class="shop-title">Laser colors</h3>
+          <div class="shop-grid" id="laser-shop"></div>
+        </section>
+      </div>
     </section>
 
-    <p class="hint">Drag anywhere in the game area · Collect ⚡ 🛡 💚</p>
+    <p class="hint">Drag anywhere · Collect 🪙 coins to unlock skins and lasers</p>
   </main>
 
   <script>
@@ -361,6 +556,66 @@
     const HEIGHT = 650;
     const BEST_SCORE_KEY = "star-defender-best-v1";
     const SOUND_KEY = "star-defender-sound-v1";
+    const COINS_KEY = "star-defender-coins-v1";
+    const INVENTORY_KEY = "star-defender-inventory-v1";
+
+    const SHIP_SKINS = [
+      {
+        id: "nova",
+        name: "Nova",
+        price: 0,
+        icon: "🚀",
+        wing: "#ff5d9e",
+        bodyStart: "#f5fbff",
+        bodyEnd: "#65dfff",
+        cockpit: "#675fe9",
+        flame: "#ffb44e",
+        outline: "#26366f"
+      },
+      {
+        id: "solar",
+        name: "Solar Flare",
+        price: 150,
+        icon: "☀️",
+        wing: "#ff8c32",
+        bodyStart: "#fff9c7",
+        bodyEnd: "#ffc83d",
+        cockpit: "#e84262",
+        flame: "#5cecff",
+        outline: "#713f22"
+      },
+      {
+        id: "nebula",
+        name: "Nebula",
+        price: 350,
+        icon: "🌌",
+        wing: "#a85dff",
+        bodyStart: "#ffd8ff",
+        bodyEnd: "#a66cff",
+        cockpit: "#50f0dc",
+        flame: "#ff62c8",
+        outline: "#372168"
+      },
+      {
+        id: "shadow",
+        name: "Shadow X",
+        price: 600,
+        icon: "🌑",
+        wing: "#252b4d",
+        bodyStart: "#9eabc9",
+        bodyEnd: "#22283e",
+        cockpit: "#72ff8d",
+        flame: "#61ff8a",
+        outline: "#0b0e1c"
+      }
+    ];
+
+    const LASER_COLORS = [
+      { id: "cyan", name: "Ice Beam", price: 0, color: "#c4fbff", glow: "#58edff", tone: 620 },
+      { id: "lime", name: "Bio Bolt", price: 120, color: "#c5ff76", glow: "#57ff70", tone: 680 },
+      { id: "plasma", name: "Pink Plasma", price: 260, color: "#ffb3e1", glow: "#ff4fb4", tone: 740 },
+      { id: "gold", name: "Gold Ray", price: 480, color: "#fff1a1", glow: "#ffc52f", tone: 820 }
+    ];
 
     const canvas = document.getElementById("game-canvas");
     const context = canvas.getContext("2d", { alpha: false });
@@ -376,6 +631,13 @@
     const actionButton = document.getElementById("action-button");
     const pauseButton = document.getElementById("pause-button");
     const soundButton = document.getElementById("sound-button");
+    const shopButton = document.getElementById("shop-button");
+    const coinBalanceDisplay = document.getElementById("coin-balance");
+    const shopOverlay = document.getElementById("shop-overlay");
+    const closeShopButton = document.getElementById("close-shop");
+    const shopBalanceDisplay = document.getElementById("shop-balance");
+    const skinShop = document.getElementById("skin-shop");
+    const laserShop = document.getElementById("laser-shop");
 
     let state = "start";
     let soundEnabled = readSoundSetting();
@@ -384,6 +646,9 @@
     let gameTime = 0;
     let score = 0;
     let bestScore = readBestScore();
+    let coins = readCoins();
+    let inventory = readInventory();
+    let shopReturnState = "start";
     let wave = 1;
     let wavePhase = "spawning";
     let waveTarget = 0;
@@ -435,6 +700,154 @@
         localStorage.setItem(SOUND_KEY, soundEnabled ? "on" : "off");
       } catch (error) {
         console.warn("The sound setting could not be saved.", error);
+      }
+    }
+
+    function readCoins() {
+      try {
+        const saved = Number.parseInt(localStorage.getItem(COINS_KEY), 10);
+        return Number.isFinite(saved) && saved >= 0 ? saved : 0;
+      } catch (error) {
+        console.warn("The coin balance could not be read.", error);
+        return 0;
+      }
+    }
+
+    function readInventory() {
+      const defaults = {
+        unlockedSkins: ["nova"],
+        unlockedLasers: ["cyan"],
+        equippedSkin: "nova",
+        equippedLaser: "cyan"
+      };
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(INVENTORY_KEY));
+        if (!saved || typeof saved !== "object") {
+          return defaults;
+        }
+
+        const skinIds = new Set(SHIP_SKINS.map((item) => item.id));
+        const laserIds = new Set(LASER_COLORS.map((item) => item.id));
+        const unlockedSkins = [...new Set(["nova", ...(Array.isArray(saved.unlockedSkins) ? saved.unlockedSkins : [])])]
+          .filter((id) => skinIds.has(id));
+        const unlockedLasers = [...new Set(["cyan", ...(Array.isArray(saved.unlockedLasers) ? saved.unlockedLasers : [])])]
+          .filter((id) => laserIds.has(id));
+
+        return {
+          unlockedSkins,
+          unlockedLasers,
+          equippedSkin: unlockedSkins.includes(saved.equippedSkin) ? saved.equippedSkin : "nova",
+          equippedLaser: unlockedLasers.includes(saved.equippedLaser) ? saved.equippedLaser : "cyan"
+        };
+      } catch (error) {
+        console.warn("The cosmetic inventory could not be read.", error);
+        return defaults;
+      }
+    }
+
+    function saveCosmeticProgress() {
+      try {
+        localStorage.setItem(COINS_KEY, String(coins));
+        localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+      } catch (error) {
+        console.warn("Cosmetic progress could not be saved.", error);
+      }
+    }
+
+    function getEquippedSkin() {
+      return SHIP_SKINS.find((item) => item.id === inventory.equippedSkin) || SHIP_SKINS[0];
+    }
+
+    function getEquippedLaser() {
+      return LASER_COLORS.find((item) => item.id === inventory.equippedLaser) || LASER_COLORS[0];
+    }
+
+    function createShopItem(item, category) {
+      const inventoryKey = category === "skin" ? "unlockedSkins" : "unlockedLasers";
+      const equippedKey = category === "skin" ? "equippedSkin" : "equippedLaser";
+      const unlocked = inventory[inventoryKey].includes(item.id);
+      const equipped = inventory[equippedKey] === item.id;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `shop-item${equipped ? " equipped" : ""}`;
+      button.setAttribute("aria-label", `${item.name}. ${equipped ? "Equipped" : unlocked ? "Unlocked" : `${item.price} coins`}`);
+
+      const preview = document.createElement("span");
+      preview.className = "shop-preview";
+      if (category === "skin") {
+        preview.textContent = item.icon;
+      } else {
+        const beam = document.createElement("span");
+        beam.className = "laser-preview";
+        beam.style.setProperty("--preview-color", item.color);
+        beam.style.setProperty("--preview-glow", item.glow);
+        preview.append(beam);
+      }
+
+      const name = document.createElement("strong");
+      name.textContent = item.name;
+      const status = document.createElement("small");
+      status.textContent = equipped ? "✓ Equipped" : unlocked ? "Tap to equip" : `🪙 ${item.price}`;
+      button.append(preview, name, status);
+      button.addEventListener("click", () => purchaseOrEquip(item, category, button));
+      return button;
+    }
+
+    function renderShop() {
+      coinBalanceDisplay.textContent = coins.toLocaleString();
+      shopBalanceDisplay.textContent = coins.toLocaleString();
+      skinShop.replaceChildren(...SHIP_SKINS.map((item) => createShopItem(item, "skin")));
+      laserShop.replaceChildren(...LASER_COLORS.map((item) => createShopItem(item, "laser")));
+    }
+
+    function purchaseOrEquip(item, category, button) {
+      const inventoryKey = category === "skin" ? "unlockedSkins" : "unlockedLasers";
+      const equippedKey = category === "skin" ? "equippedSkin" : "equippedLaser";
+      const unlocked = inventory[inventoryKey].includes(item.id);
+
+      if (!unlocked) {
+        if (coins < item.price) {
+          button.classList.remove("cannot-afford");
+          void button.offsetWidth;
+          button.classList.add("cannot-afford");
+          playTone(135, 0.18, "sawtooth", 0.05);
+          return;
+        }
+
+        coins -= item.price;
+        inventory[inventoryKey].push(item.id);
+        playTone(660, 0.1, "sine", 0.06);
+        playTone(920, 0.17, "sine", 0.06, 0.09);
+      } else {
+        playTone(740, 0.09, "sine", 0.04);
+      }
+
+      inventory[equippedKey] = item.id;
+      saveCosmeticProgress();
+      updateHud();
+      renderShop();
+    }
+
+    function openShop() {
+      if (state === "shop") {
+        return;
+      }
+      shopReturnState = state;
+      state = "shop";
+      activePointer = null;
+      renderShop();
+      shopOverlay.classList.add("visible");
+    }
+
+    function closeShop() {
+      if (state !== "shop") {
+        return;
+      }
+      shopOverlay.classList.remove("visible");
+      state = shopReturnState;
+      if (state === "running") {
+        lastFrameTime = performance.now();
       }
     }
 
@@ -509,6 +922,7 @@
     function updateHud() {
       scoreDisplay.textContent = score.toLocaleString();
       waveDisplay.textContent = String(wave);
+      coinBalanceDisplay.textContent = coins.toLocaleString();
       const fullHearts = "♥".repeat(Math.max(0, player.health));
       const emptyHearts = "♡".repeat(Math.max(0, player.maximumHealth - player.health));
       healthDisplay.textContent = fullHearts + emptyHearts;
@@ -689,14 +1103,29 @@
 
     function firePlayerLaser() {
       const rapid = gameTime < player.rapidUntil;
+      const laser = getEquippedLaser();
       const speed = 540;
-      playerBullets.push({ x: player.x - 8, y: player.y - 19, radius: 4, velocityY: -speed });
-      playerBullets.push({ x: player.x + 8, y: player.y - 19, radius: 4, velocityY: -speed });
+      playerBullets.push({
+        x: player.x - 8,
+        y: player.y - 19,
+        radius: 4,
+        velocityY: -speed,
+        color: laser.color,
+        glow: laser.glow
+      });
+      playerBullets.push({
+        x: player.x + 8,
+        y: player.y - 19,
+        radius: 4,
+        velocityY: -speed,
+        color: laser.color,
+        glow: laser.glow
+      });
       shotTimer = rapid ? 0.1 : 0.24;
       shotCounter += 1;
 
       if (shotCounter % (rapid ? 5 : 3) === 0) {
-        playTone(620, 0.055, "square", 0.025);
+        playTone(laser.tone, 0.055, "square", 0.025);
       }
     }
 
@@ -722,7 +1151,20 @@
     function spawnPowerUp(x, y, forcedType = null) {
       const roll = Math.random();
       const type = forcedType || (roll < 0.45 ? "rapid" : roll < 0.78 ? "shield" : "heal");
-      powerUps.push({ x, y, radius: 16, type, velocityY: 85, phase: 0 });
+      powerUps.push({ x, y, radius: 16, type, velocityY: 85, velocityX: 0, phase: 0, amount: 0 });
+    }
+
+    function spawnCoin(x, y, amount = 1) {
+      powerUps.push({
+        x: clamp(x + randomBetween(-12, 12), 18, WIDTH - 18),
+        y,
+        radius: 13,
+        type: "coin",
+        velocityY: randomBetween(70, 105),
+        velocityX: randomBetween(-25, 25),
+        phase: Math.random() * Math.PI * 2,
+        amount
+      });
     }
 
     function createBurst(x, y, color, amount = 10) {
@@ -751,9 +1193,17 @@
 
       if (boss) {
         spawnPowerUp(enemy.x, enemy.y, "shield");
+        for (let index = 0; index < 9; index += 1) {
+          spawnCoin(enemy.x + randomBetween(-34, 34), enemy.y + randomBetween(-18, 18), 3);
+        }
         vibrate([60, 30, 60]);
-      } else if (Math.random() < 0.16) {
-        spawnPowerUp(enemy.x, enemy.y);
+      } else {
+        if (Math.random() < 0.48) {
+          spawnCoin(enemy.x, enemy.y, enemy.type === "tank" ? 3 : enemy.type === "zigzag" ? 2 : 1);
+        }
+        if (Math.random() < 0.14) {
+          spawnPowerUp(enemy.x, enemy.y);
+        }
       }
     }
 
@@ -783,6 +1233,17 @@
     }
 
     function collectPowerUp(powerUp) {
+      if (powerUp.type === "coin") {
+        coins += powerUp.amount;
+        score += powerUp.amount * 10;
+        saveCosmeticProgress();
+        createBurst(powerUp.x, powerUp.y, "#ffd65a", 10);
+        playTone(880, 0.08, "sine", 0.045);
+        vibrate(12);
+        updateHud();
+        return;
+      }
+
       if (powerUp.type === "rapid") {
         player.rapidUntil = gameTime + 8;
         playTone(720, 0.1, "square", 0.05);
@@ -931,7 +1392,7 @@
 
           playerBullets.splice(bulletIndex, 1);
           enemy.health -= 1;
-          createBurst(bullet.x, bullet.y, "#68efff", 4);
+          createBurst(bullet.x, bullet.y, bullet.glow || "#68efff", 4);
 
           if (enemy.health <= 0) {
             enemies.splice(enemyIndex, 1);
@@ -970,7 +1431,8 @@
         const powerUp = powerUps[index];
         powerUp.phase += deltaTime * 5;
         powerUp.y += powerUp.velocityY * deltaTime;
-        powerUp.x += Math.sin(powerUp.phase) * 24 * deltaTime;
+        powerUp.x += (powerUp.velocityX || 0) * deltaTime + Math.sin(powerUp.phase) * 24 * deltaTime;
+        powerUp.x = clamp(powerUp.x, powerUp.radius, WIDTH - powerUp.radius);
 
         if (circlesOverlap(powerUp, player, 2)) {
           powerUps.splice(index, 1);
@@ -1067,6 +1529,7 @@
 
       context.save();
       context.translate(player.x, player.y);
+      const skin = getEquippedSkin();
 
       if (gameTime < player.shieldUntil) {
         context.strokeStyle = "rgba(91, 240, 255, 0.85)";
@@ -1079,7 +1542,7 @@
         context.shadowBlur = 0;
       }
 
-      context.fillStyle = "#ffb44e";
+      context.fillStyle = skin.flame;
       context.beginPath();
       context.moveTo(-8, 18);
       context.lineTo(0, 35 + Math.sin(gameTime * 20) * 5);
@@ -1087,7 +1550,7 @@
       context.closePath();
       context.fill();
 
-      context.fillStyle = "#ff5d9e";
+      context.fillStyle = skin.wing;
       context.beginPath();
       context.moveTo(-24, 15);
       context.lineTo(-10, -8);
@@ -1102,10 +1565,10 @@
       context.fill();
 
       const bodyGradient = context.createLinearGradient(-12, -25, 12, 22);
-      bodyGradient.addColorStop(0, "#f5fbff");
-      bodyGradient.addColorStop(1, "#65dfff");
+      bodyGradient.addColorStop(0, skin.bodyStart);
+      bodyGradient.addColorStop(1, skin.bodyEnd);
       context.fillStyle = bodyGradient;
-      context.strokeStyle = "#26366f";
+      context.strokeStyle = skin.outline;
       context.lineWidth = 3;
       context.beginPath();
       context.moveTo(0, -29);
@@ -1116,7 +1579,7 @@
       context.fill();
       context.stroke();
 
-      context.fillStyle = "#675fe9";
+      context.fillStyle = skin.cockpit;
       context.beginPath();
       context.ellipse(0, -6, 7, 10, 0, 0, Math.PI * 2);
       context.fill();
@@ -1202,9 +1665,9 @@
     function drawBullets() {
       context.save();
       context.shadowBlur = 10;
-      context.shadowColor = "#58edff";
-      context.fillStyle = "#baf9ff";
       for (const bullet of playerBullets) {
+        context.shadowColor = bullet.glow || "#58edff";
+        context.fillStyle = bullet.color || "#baf9ff";
         roundedRectangle(bullet.x - 3, bullet.y - 10, 6, 18, 3);
         context.fill();
       }
@@ -1220,8 +1683,8 @@
     }
 
     function drawPowerUps() {
-      const symbols = { rapid: "⚡", shield: "🛡", heal: "♥" };
-      const colors = { rapid: "#ffd55b", shield: "#62eaff", heal: "#65f1a9" };
+      const symbols = { rapid: "⚡", shield: "🛡", heal: "♥", coin: "★" };
+      const colors = { rapid: "#ffd55b", shield: "#62eaff", heal: "#65f1a9", coin: "#ffd34e" };
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.font = "bold 17px system-ui";
@@ -1369,7 +1832,13 @@
       if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) {
         event.preventDefault();
       }
-      if (event.key === "Escape" || event.key === "p") {
+      if (event.key === "Escape") {
+        if (state === "shop") {
+          closeShop();
+        } else {
+          state === "running" ? pauseGame() : resumeGame();
+        }
+      } else if (event.key.toLowerCase() === "p") {
         state === "running" ? pauseGame() : resumeGame();
       }
     });
@@ -1392,6 +1861,14 @@
         pauseGame();
       } else if (state === "paused") {
         resumeGame();
+      }
+    });
+
+    shopButton.addEventListener("click", openShop);
+    closeShopButton.addEventListener("click", closeShop);
+    shopOverlay.addEventListener("click", (event) => {
+      if (event.target === shopOverlay) {
+        closeShop();
       }
     });
 
@@ -1420,10 +1897,11 @@
     state = "start";
     soundButton.textContent = soundEnabled ? "🔊" : "🔇";
     soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
+    renderShop();
     showOverlay(
       "🚀",
       "Star Defender",
-      `Protect the galaxy from goofy invaders. High score: ${bestScore.toLocaleString()}.`,
+      `Protect the galaxy from goofy invaders. High score: ${bestScore.toLocaleString()} · Coins: ${coins.toLocaleString()}.`,
       "Start Mission",
       true
     );

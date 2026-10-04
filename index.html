@@ -285,9 +285,11 @@
         }
 
         const shooterScore = Number.parseInt(localStorage.getItem("star-defender-best-v1"), 10);
-        if (Number.isFinite(shooterScore) && shooterScore > 0) {
-          document.getElementById("shooter-best").textContent = `High score: ${shooterScore.toLocaleString()}`;
-        }
+        const shooterCoins = Number.parseInt(localStorage.getItem("star-defender-coins-v1"), 10);
+        const safeScore = Number.isFinite(shooterScore) && shooterScore > 0 ? shooterScore : 0;
+        const safeCoins = Number.isFinite(shooterCoins) && shooterCoins > 0 ? shooterCoins : 0;
+        document.getElementById("shooter-best").textContent =
+          `High score: ${safeScore.toLocaleString()} · 🪙 ${safeCoins.toLocaleString()}`;
       } catch (error) {
         console.warn("Saved scores could not be loaded.", error);
       }

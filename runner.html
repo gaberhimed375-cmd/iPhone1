@@ -1018,18 +1018,23 @@
     }
 
     function drawWorld() {
+      const cycle = (Math.sin(distance / 1200) + 1) * 0.5;
       const sky = context.createLinearGradient(0, 0, 0, HEIGHT);
-      sky.addColorStop(0, "#63c7c4");
-      sky.addColorStop(0.34, "#b8dd8a");
+      sky.addColorStop(0, `hsl(${192 + cycle * 24} 52% ${28 + cycle * 28}%)`);
+      sky.addColorStop(0.34, `hsl(${72 + cycle * 30} 45% ${40 + cycle * 28}%)`);
       sky.addColorStop(0.35, "#567948");
       sky.addColorStop(1, "#203d2f");
       context.fillStyle = sky;
       context.fillRect(0, 0, WIDTH, HEIGHT);
 
-      context.fillStyle = "rgba(255, 232, 145, 0.8)";
-      context.beginPath();
-      context.arc(310, 92, 35, 0, Math.PI * 2);
-      context.fill();
+      const sunX = 300 - cycle * 30;
+      const sunY = 105 - cycle * 38;
+      const sunGlow = context.createRadialGradient(sunX, sunY, 4, sunX, sunY, 72);
+      sunGlow.addColorStop(0, "rgba(255, 244, 174, 0.95)");
+      sunGlow.addColorStop(0.25, "rgba(255, 216, 113, 0.52)");
+      sunGlow.addColorStop(1, "rgba(255, 190, 84, 0)");
+      context.fillStyle = sunGlow;
+      context.fillRect(sunX - 75, sunY - 75, 150, 150);
 
       context.fillStyle = "#345e45";
       context.beginPath();
@@ -1045,7 +1050,11 @@
       context.closePath();
       context.fill();
 
-      context.fillStyle = "#172d26";
+      const roadGradient = context.createLinearGradient(0, HORIZON_Y, 0, HEIGHT);
+      roadGradient.addColorStop(0, "#273c31");
+      roadGradient.addColorStop(0.55, "#172d26");
+      roadGradient.addColorStop(1, "#0d1c18");
+      context.fillStyle = roadGradient;
       context.beginPath();
       context.moveTo(WIDTH / 2 - 48, HORIZON_Y);
       context.lineTo(WIDTH / 2 + 48, HORIZON_Y);
@@ -1132,6 +1141,13 @@
       context.save();
       context.translate(x, y);
       context.scale(scale, scale);
+      context.save();
+      context.globalAlpha = 0.3;
+      context.fillStyle = "#07150f";
+      context.beginPath();
+      context.ellipse(0, 17, 36, 9, 0, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
       if (object.type === "barrier") {
         context.fillStyle = "#a96732";
         context.strokeStyle = "#50321f";
@@ -1186,7 +1202,8 @@
     function drawCoin(object, x, y, scale) {
       context.save();
       context.translate(x, y - 13 * scale + Math.sin(object.phase) * 3 * scale);
-      context.scale(scale, scale);
+      const spin = 0.28 + Math.abs(Math.cos(object.phase * 0.9)) * 0.72;
+      context.scale(scale * spin, scale);
       context.fillStyle = "#ffd34f";
       context.strokeStyle = "#b36c18";
       context.lineWidth = 3;
@@ -1335,6 +1352,15 @@
       context.fill();
       context.stroke();
 
+      context.fillStyle = "#ffcf55";
+      context.beginPath();
+      context.moveTo(-12, -10);
+      context.lineTo(13, -7);
+      context.lineTo(25 + Math.sin(gameTime * 8) * 5, -1);
+      context.lineTo(11, 1);
+      context.closePath();
+      context.fill();
+
       context.strokeStyle = "#dca06e";
       context.lineWidth = 7;
       context.beginPath();
@@ -1405,6 +1431,53 @@
       context.restore();
     }
 
+    function drawWorldLighting() {
+      context.save();
+      const horizonFog = context.createLinearGradient(0, HORIZON_Y - 10, 0, HORIZON_Y + 150);
+      horizonFog.addColorStop(0, "rgba(235, 255, 193, 0.34)");
+      horizonFog.addColorStop(1, "rgba(235, 255, 193, 0)");
+      context.fillStyle = horizonFog;
+      context.fillRect(0, HORIZON_Y - 10, WIDTH, 170);
+
+      context.globalCompositeOperation = "lighter";
+      const runnerX = laneX(visualLane, 0.84);
+      const runnerY = PLAYER_Y - jumpHeight;
+      const runnerGlow = context.createRadialGradient(runnerX, runnerY, 3, runnerX, runnerY, 72);
+      runnerGlow.addColorStop(0, "rgba(255, 202, 92, 0.12)");
+      runnerGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      context.fillStyle = runnerGlow;
+      context.fillRect(runnerX - 75, runnerY - 75, 150, 150);
+      context.restore();
+    }
+
+    function drawCinematicFx() {
+      context.save();
+      const vignette = context.createRadialGradient(WIDTH / 2, HEIGHT * 0.48, 170, WIDTH / 2, HEIGHT * 0.48, 390);
+      vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+      vignette.addColorStop(0.72, "rgba(4, 15, 10, 0.06)");
+      vignette.addColorStop(1, "rgba(4, 12, 9, 0.5)");
+      context.fillStyle = vignette;
+      context.fillRect(0, 0, WIDTH, HEIGHT);
+
+      if (!reducedMotion) {
+        context.globalAlpha = 0.18;
+        context.fillStyle = "#173e28";
+        for (let index = 0; index < 5; index += 1) {
+          const side = index % 2 === 0 ? -1 : 1;
+          const x = side < 0 ? -4 + (index * 23 + distance * 1.7) % 42 : WIDTH + 4 - (index * 19 + distance * 1.4) % 42;
+          const y = 160 + (index * 119 + distance * 2.6) % 470;
+          context.save();
+          context.translate(x, y);
+          context.rotate(side * 0.55);
+          context.beginPath();
+          context.ellipse(0, 0, 8, 25, 0, 0, Math.PI * 2);
+          context.fill();
+          context.restore();
+        }
+      }
+      context.restore();
+    }
+
     function draw() {
       context.fillStyle = "#102a23";
       context.fillRect(0, 0, WIDTH, HEIGHT);
@@ -1421,8 +1494,10 @@
       drawObjects();
       drawRunner();
       drawParticles();
+      drawWorldLighting();
       drawStatus();
       context.restore();
+      drawCinematicFx();
 
       if (flashAlpha > 0) {
         context.save();

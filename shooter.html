@@ -675,6 +675,7 @@
     let enemies = [];
     let powerUps = [];
     let particles = [];
+    let spacePlate = null;
     const pressedKeys = new Set();
 
     function readBestScore() {
@@ -868,6 +869,7 @@
       canvas.height = Math.round(HEIGHT * pixelRatio);
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       context.imageSmoothingEnabled = true;
+      buildSpacePlate();
     }
 
     function randomBetween(minimum, maximum) {
@@ -1527,13 +1529,66 @@
       context.closePath();
     }
 
+    function buildSpacePlate() {
+      const plate = document.createElement("canvas");
+      plate.width = WIDTH;
+      plate.height = HEIGHT;
+      const plateContext = plate.getContext("2d", { alpha: false });
+      const spaceGradient = plateContext.createLinearGradient(0, 0, WIDTH, HEIGHT);
+      spaceGradient.addColorStop(0, "#05091d");
+      spaceGradient.addColorStop(0.42, "#151748");
+      spaceGradient.addColorStop(0.72, "#321750");
+      spaceGradient.addColorStop(1, "#090d28");
+      plateContext.fillStyle = spaceGradient;
+      plateContext.fillRect(0, 0, WIDTH, HEIGHT);
+
+      const nebulaA = plateContext.createRadialGradient(55, 210, 8, 55, 210, 190);
+      nebulaA.addColorStop(0, "rgba(81, 222, 255, 0.22)");
+      nebulaA.addColorStop(0.42, "rgba(72, 97, 220, 0.12)");
+      nebulaA.addColorStop(1, "rgba(0, 0, 0, 0)");
+      plateContext.fillStyle = nebulaA;
+      plateContext.fillRect(0, 0, WIDTH, HEIGHT);
+
+      const nebulaB = plateContext.createRadialGradient(340, 390, 10, 340, 390, 230);
+      nebulaB.addColorStop(0, "rgba(255, 78, 177, 0.2)");
+      nebulaB.addColorStop(0.5, "rgba(121, 62, 184, 0.1)");
+      nebulaB.addColorStop(1, "rgba(0, 0, 0, 0)");
+      plateContext.fillStyle = nebulaB;
+      plateContext.fillRect(0, 0, WIDTH, HEIGHT);
+
+      plateContext.save();
+      plateContext.translate(318, 125);
+      const planet = plateContext.createRadialGradient(-12, -15, 4, 0, 0, 54);
+      planet.addColorStop(0, "#c7e8ff");
+      planet.addColorStop(0.35, "#647dc7");
+      planet.addColorStop(1, "#171b52");
+      plateContext.fillStyle = planet;
+      plateContext.beginPath();
+      plateContext.arc(0, 0, 48, 0, Math.PI * 2);
+      plateContext.fill();
+      plateContext.strokeStyle = "rgba(196, 231, 255, 0.26)";
+      plateContext.lineWidth = 7;
+      plateContext.beginPath();
+      plateContext.ellipse(0, 3, 72, 16, -0.18, 0, Math.PI * 2);
+      plateContext.stroke();
+      plateContext.restore();
+
+      for (let index = 0; index < 95; index += 1) {
+        const x = (index * 83.17) % WIDTH;
+        const y = (index * 47.63) % HEIGHT;
+        const alpha = 0.08 + (index % 5) * 0.025;
+        plateContext.fillStyle = `rgba(214, 224, 255, ${alpha})`;
+        plateContext.fillRect(Math.round(x), Math.round(y), index % 11 === 0 ? 2 : 1, 1);
+      }
+      spacePlate = plate;
+    }
+
     function drawBackground() {
-      const gradient = context.createLinearGradient(0, 0, 0, HEIGHT);
-      gradient.addColorStop(0, "#11183f");
-      gradient.addColorStop(0.58, "#25205b");
-      gradient.addColorStop(1, "#4c1d69");
-      context.fillStyle = gradient;
-      context.fillRect(0, 0, WIDTH, HEIGHT);
+      if (spacePlate) context.drawImage(spacePlate, 0, 0, WIDTH, HEIGHT);
+      else {
+        context.fillStyle = "#080c25";
+        context.fillRect(0, 0, WIDTH, HEIGHT);
+      }
 
       context.save();
       for (const star of stars) {
@@ -1542,15 +1597,18 @@
         context.beginPath();
         context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         context.fill();
+        if (star.size > 1.9) {
+          context.strokeStyle = "rgba(189, 244, 255, 0.38)";
+          context.lineWidth = 0.7;
+          context.beginPath();
+          context.moveTo(star.x - star.size * 3, star.y);
+          context.lineTo(star.x + star.size * 3, star.y);
+          context.moveTo(star.x, star.y - star.size * 3);
+          context.lineTo(star.x, star.y + star.size * 3);
+          context.stroke();
+        }
       }
       context.restore();
-
-      context.globalAlpha = 0.13;
-      context.fillStyle = "#d85ca8";
-      context.beginPath();
-      context.arc(45, 170, 92, 0, Math.PI * 2);
-      context.fill();
-      context.globalAlpha = 1;
     }
 
     function drawShip() {
@@ -1561,6 +1619,17 @@
       context.save();
       context.translate(player.x, player.y);
       const skin = getEquippedSkin();
+
+      context.save();
+      context.globalCompositeOperation = "lighter";
+      const engineGlow = context.createRadialGradient(0, 22, 1, 0, 22, 28);
+      engineGlow.addColorStop(0, skin.flame);
+      engineGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      context.fillStyle = engineGlow;
+      context.beginPath();
+      context.arc(0, 22, 28, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
 
       if (gameTime < player.shieldUntil) {
         context.strokeStyle = "rgba(91, 240, 255, 0.85)";
@@ -1610,6 +1679,20 @@
       context.fill();
       context.stroke();
 
+      context.strokeStyle = "rgba(255, 255, 255, 0.5)";
+      context.lineWidth = 1.4;
+      context.beginPath();
+      context.moveTo(0, -24);
+      context.lineTo(0, 17);
+      context.moveTo(-10, 8);
+      context.lineTo(10, 8);
+      context.stroke();
+      context.fillStyle = skin.flame;
+      context.beginPath();
+      context.arc(-15, 10, 2.5, 0, Math.PI * 2);
+      context.arc(15, 10, 2.5, 0, Math.PI * 2);
+      context.fill();
+
       context.fillStyle = skin.cockpit;
       context.beginPath();
       context.ellipse(0, -6, 7, 10, 0, 0, Math.PI * 2);
@@ -1645,7 +1728,11 @@
         context.fill();
       } else {
         const bodyColor = enemy.type === "tank" ? "#ff9d45" : enemy.type === "zigzag" ? "#9b74ff" : "#68e3a3";
-        context.fillStyle = bodyColor;
+        const enemyGradient = context.createRadialGradient(-7, -9, 2, 0, 0, enemy.radius * 1.15);
+        enemyGradient.addColorStop(0, "#ffffff");
+        enemyGradient.addColorStop(0.12, bodyColor);
+        enemyGradient.addColorStop(1, enemy.type === "tank" ? "#8f3f2e" : enemy.type === "zigzag" ? "#3f2b84" : "#247151");
+        context.fillStyle = enemyGradient;
         context.strokeStyle = "#25204f";
         context.lineWidth = 3;
         context.beginPath();
@@ -1677,6 +1764,32 @@
         context.beginPath();
         context.arc(0, 5, 7, 0.15, Math.PI - 0.15);
         context.stroke();
+
+        if (enemy.type === "tank") {
+          context.fillStyle = "#ffd16e";
+          for (const x of [-13, 13]) {
+            context.beginPath();
+            context.arc(x, 8, 3, 0, Math.PI * 2);
+            context.fill();
+          }
+        } else if (enemy.type === "zigzag") {
+          context.strokeStyle = "#d9c9ff";
+          context.lineWidth = 2;
+          context.beginPath();
+          context.moveTo(0, -enemy.radius + 2);
+          context.lineTo(0, -enemy.radius - 9);
+          context.stroke();
+          context.fillStyle = "#ff6fbd";
+          context.beginPath();
+          context.arc(0, -enemy.radius - 11, 3, 0, Math.PI * 2);
+          context.fill();
+        } else {
+          context.strokeStyle = "rgba(255, 255, 255, 0.5)";
+          context.lineWidth = 2;
+          context.beginPath();
+          context.arc(0, 0, enemy.radius - 5, Math.PI * 1.08, Math.PI * 1.72);
+          context.stroke();
+        }
       }
 
       context.restore();
@@ -1695,19 +1808,35 @@
 
     function drawBullets() {
       context.save();
-      context.shadowBlur = 10;
+      context.globalCompositeOperation = "lighter";
+      context.lineCap = "round";
       for (const bullet of playerBullets) {
-        context.shadowColor = bullet.glow || "#58edff";
-        context.fillStyle = bullet.color || "#baf9ff";
-        roundedRectangle(bullet.x - 3, bullet.y - 10, 6, 18, 3);
-        context.fill();
+        context.strokeStyle = bullet.glow || "#58edff";
+        context.globalAlpha = 0.28;
+        context.lineWidth = 9;
+        context.beginPath();
+        context.moveTo(bullet.x, bullet.y + 26);
+        context.lineTo(bullet.x, bullet.y - 8);
+        context.stroke();
+        context.globalAlpha = 1;
+        context.strokeStyle = bullet.color || "#baf9ff";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(bullet.x, bullet.y + 18);
+        context.lineTo(bullet.x, bullet.y - 10);
+        context.stroke();
       }
 
-      context.shadowColor = "#ff5d9f";
-      context.fillStyle = "#ff76b3";
       for (const bullet of enemyBullets) {
+        context.globalAlpha = 0.22;
+        context.fillStyle = "#ff2f98";
         context.beginPath();
-        context.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
+        context.arc(bullet.x, bullet.y, bullet.radius * 2.3, 0, Math.PI * 2);
+        context.fill();
+        context.globalAlpha = 1;
+        context.fillStyle = "#ffd2eb";
+        context.beginPath();
+        context.arc(bullet.x, bullet.y, bullet.radius * 0.72, 0, Math.PI * 2);
         context.fill();
       }
       context.restore();
@@ -1791,18 +1920,50 @@
       context.restore();
     }
 
+    function drawLighting() {
+      context.save();
+      context.globalCompositeOperation = "lighter";
+      const shipLight = context.createRadialGradient(player.x, player.y, 2, player.x, player.y, 88);
+      shipLight.addColorStop(0, "rgba(89, 230, 255, 0.16)");
+      shipLight.addColorStop(1, "rgba(0, 0, 0, 0)");
+      context.fillStyle = shipLight;
+      context.fillRect(player.x - 90, player.y - 90, 180, 180);
+
+      for (const powerUp of powerUps.slice(0, 12)) {
+        const color = powerUp.type === "coin" ? "255, 211, 78" : powerUp.type === "shield" ? "98, 234, 255" : "113, 255, 183";
+        const glow = context.createRadialGradient(powerUp.x, powerUp.y, 1, powerUp.x, powerUp.y, 34);
+        glow.addColorStop(0, `rgba(${color}, 0.2)`);
+        glow.addColorStop(1, `rgba(${color}, 0)`);
+        context.fillStyle = glow;
+        context.fillRect(powerUp.x - 35, powerUp.y - 35, 70, 70);
+      }
+      context.restore();
+    }
+
+    function drawPostFx() {
+      context.save();
+      const vignette = context.createRadialGradient(WIDTH / 2, HEIGHT * 0.48, 130, WIDTH / 2, HEIGHT * 0.48, 390);
+      vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+      vignette.addColorStop(0.7, "rgba(2, 3, 14, 0.08)");
+      vignette.addColorStop(1, "rgba(2, 3, 14, 0.52)");
+      context.fillStyle = vignette;
+      context.fillRect(0, 0, WIDTH, HEIGHT);
+      context.globalAlpha = 0.035;
+      context.fillStyle = "#b7d8ff";
+      for (let y = 1; y < HEIGHT; y += 7) context.fillRect(0, y, WIDTH, 1);
+      context.restore();
+    }
+
     function draw() {
       drawBackground();
+      for (const enemy of enemies) drawEnemy(enemy);
       drawBullets();
-      for (const enemy of enemies) {
-        drawEnemy(enemy);
-      }
       drawPowerUps();
+      if (player) drawShip();
       drawParticles();
-      if (player) {
-        drawShip();
-        drawPowerStatus();
-      }
+      if (player) drawLighting();
+      drawPostFx();
+      if (player) drawPowerStatus();
       drawWaveBanner();
     }
 

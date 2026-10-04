@@ -1457,3 +1457,97 @@ body[data-game] .shop-preview {
   font-weight: 900;
   letter-spacing: 0.1em;
 }
+
+/* High-fidelity Critter Match cards */
+body[data-game="matching"] .card {
+  isolation: isolate;
+  filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.34));
+}
+
+body[data-game="matching"] .card-face {
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.24), inset 0 -10px 22px rgba(13, 9, 35, 0.16);
+}
+
+body[data-game="matching"] .card-face::before {
+  position: absolute;
+  inset: 6px;
+  z-index: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  content: "";
+  pointer-events: none;
+}
+
+body[data-game="matching"] .card-face::after {
+  position: absolute;
+  inset: -45% -80%;
+  z-index: 2;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.34) 48%, rgba(255, 255, 255, 0.08) 55%, transparent 64%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-35%) rotate(8deg);
+}
+
+body[data-game="matching"] .card.flipped .card-front::after,
+body[data-game="matching"] .card.matched .card-front::after {
+  animation: card-foil 700ms ease-out;
+}
+
+body[data-game="matching"] .card-back {
+  background:
+    linear-gradient(45deg, transparent 47%, rgba(255, 255, 255, 0.08) 48% 52%, transparent 53%) 0 0 / 18px 18px,
+    radial-gradient(circle at 50% 42%, rgba(211, 184, 255, 0.36), transparent 36%),
+    linear-gradient(145deg, #31206d, #6f43d7 48%, #b53c82);
+}
+
+body[data-game="matching"] .card-back::before {
+  border-color: rgba(231, 216, 255, 0.3);
+  background:
+    linear-gradient(90deg, transparent 48%, rgba(255, 255, 255, 0.13) 49% 51%, transparent 52%),
+    linear-gradient(transparent 48%, rgba(255, 255, 255, 0.13) 49% 51%, transparent 52%);
+  background-size: 22px 22px;
+}
+
+body[data-game="matching"] .card-front {
+  background:
+    radial-gradient(circle at 50% 72%, rgba(26, 22, 62, 0.2), transparent 26%),
+    linear-gradient(155deg, #fdfbff, #d9d4ef 62%, #aaa1d2);
+}
+
+body[data-game="matching"] .card[data-animal="animal-dog"] .card-front { background: radial-gradient(circle at 50% 66%, #b997ff 0 26%, transparent 27%), linear-gradient(145deg, #241c47, #4d387c); }
+body[data-game="matching"] .card[data-animal="animal-cat"] .card-front { background: radial-gradient(circle at 50% 66%, #ffad77 0 26%, transparent 27%), linear-gradient(145deg, #40212a, #813e46); }
+body[data-game="matching"] .card[data-animal="animal-panda"] .card-front { background: radial-gradient(circle at 50% 66%, #e8e6df 0 26%, transparent 27%), linear-gradient(145deg, #1c2530, #485260); }
+body[data-game="matching"] .card[data-animal="animal-fox"] .card-front { background: radial-gradient(circle at 50% 66%, #ff8158 0 26%, transparent 27%), linear-gradient(145deg, #3d211d, #743b2b); }
+body[data-game="matching"] .card[data-animal="animal-frog"] .card-front { background: radial-gradient(circle at 50% 66%, #8add57 0 26%, transparent 27%), linear-gradient(145deg, #173b31, #37694c); }
+body[data-game="matching"] .card[data-animal="animal-monkey"] .card-front { background: radial-gradient(circle at 50% 66%, #c28155 0 26%, transparent 27%), linear-gradient(145deg, #33251f, #67463a); }
+body[data-game="matching"] .card[data-animal="animal-lion"] .card-front { background: radial-gradient(circle at 50% 66%, #ffc657 0 26%, transparent 27%), linear-gradient(145deg, #3f2d19, #765329); }
+body[data-game="matching"] .card[data-animal="animal-rabbit"] .card-front { background: radial-gradient(circle at 50% 66%, #dcd0ff 0 26%, transparent 27%), linear-gradient(145deg, #29223f, #5d4a7c); }
+
+body[data-game="matching"] .critter-art {
+  position: relative;
+  z-index: 1;
+  width: 88%;
+  height: 88%;
+  filter: drop-shadow(0 9px 7px rgba(7, 5, 20, 0.35));
+  transition: filter 250ms ease, transform 360ms cubic-bezier(0.2, 1.2, 0.3, 1);
+}
+
+body[data-game="matching"] .card.flipped .critter-art {
+  transform: translateY(-2px) scale(1.03);
+}
+
+body[data-game="matching"] .card.matched .critter-art {
+  filter: drop-shadow(0 0 13px rgba(112, 239, 180, 0.72));
+  transform: scale(1.08);
+}
+
+body[data-game="matching"] .card.matched .card-front {
+  box-shadow: inset 0 0 0 2px rgba(112, 239, 180, 0.82), inset 0 0 24px rgba(112, 239, 180, 0.24);
+}
+
+@keyframes card-foil {
+  0% { opacity: 0; transform: translateX(-38%) rotate(8deg); }
+  35% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateX(38%) rotate(8deg); }
+}

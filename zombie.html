@@ -688,6 +688,7 @@
     let pointerStart = null;
     let message = "";
     let messageTimer = 0;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function readCoins() {
       try {
@@ -1303,6 +1304,21 @@
       context.fillStyle = gradient;
       context.fillRect(0, 0, WIDTH, HEIGHT);
 
+      context.save();
+      context.globalAlpha = 0.13;
+      context.strokeStyle = map.rubble;
+      context.lineWidth = 1;
+      for (let index = 0; index < 38; index += 1) {
+        const x = (index * 97.3) % WIDTH;
+        const y = 62 + (index * 53.7) % (HEIGHT - 70);
+        context.beginPath();
+        context.moveTo(x - 5, y);
+        context.lineTo(x + 2, y - 3);
+        context.lineTo(x + 7, y + 2);
+        context.stroke();
+      }
+      context.restore();
+
       context.strokeStyle = map.grid;
       context.lineWidth = 2;
       for (let row = 0; row <= ROWS; row += 1) {
@@ -1343,6 +1359,12 @@
       context.strokeStyle = connected ? map.borderConnected : map.border;
       context.lineWidth = 2;
       context.stroke();
+      context.globalAlpha = connected ? 0.5 : 0.2;
+      context.strokeStyle = connected ? map.laneConnected : "#ffffff";
+      context.lineWidth = 1;
+      roundedRectangle(-27, -27, 54, 54, 10);
+      context.stroke();
+      context.globalAlpha = 1;
 
       context.lineCap = "round";
       for (const directionName of connections) {
@@ -1405,6 +1427,21 @@
       context.beginPath();
       context.arc(0, -2, 18, 0, Math.PI * 2);
       context.fill();
+      context.stroke();
+      context.strokeStyle = "rgba(28, 43, 34, 0.65)";
+      context.lineWidth = 2;
+      context.beginPath();
+      if ((tile.row + tile.column) % 3 === 0) {
+        context.moveTo(-12, -15);
+        context.lineTo(-5, -9);
+        context.lineTo(-10, -4);
+      } else if ((tile.row + tile.column) % 3 === 1) {
+        context.moveTo(5, -17);
+        context.lineTo(2, -8);
+        context.lineTo(11, -11);
+      } else {
+        context.arc(0, -3, 13, Math.PI * 1.08, Math.PI * 1.62);
+      }
       context.stroke();
       context.fillStyle = "#fff2a5";
       context.beginPath();
@@ -1598,9 +1635,69 @@
       context.restore();
     }
 
+    function drawGroundFog(foreground = false) {
+      const map = getEquippedMap();
+      context.save();
+      context.globalCompositeOperation = foreground ? "screen" : "source-over";
+      for (let index = 0; index < 4; index += 1) {
+        const drift = reducedMotion ? 0 : Math.sin(pulseTime * (0.16 + index * 0.03) + index * 1.7) * 34;
+        const x = 40 + index * 105 + drift;
+        const y = foreground ? 500 + index * 28 : 170 + index * 105;
+        const fog = context.createRadialGradient(x, y, 8, x, y, foreground ? 105 : 82);
+        fog.addColorStop(0, `${map.exit}16`);
+        fog.addColorStop(1, "rgba(0, 0, 0, 0)");
+        context.fillStyle = fog;
+        context.fillRect(x - 110, y - 80, 220, 160);
+      }
+      context.restore();
+    }
+
+    function drawLighting() {
+      const map = getEquippedMap();
+      const start = puzzle.tiles.find((tile) => tile.kind === "start");
+      const exit = puzzle.tiles.find((tile) => tile.kind === "exit");
+      const startCenter = tileCenter(start);
+      const exitCenter = tileCenter(exit);
+      context.save();
+      context.globalCompositeOperation = "lighter";
+
+      const survivorLight = context.createRadialGradient(startCenter.x, startCenter.y, 5, startCenter.x, startCenter.y, 90);
+      survivorLight.addColorStop(0, "rgba(255, 218, 112, 0.2)");
+      survivorLight.addColorStop(1, "rgba(0, 0, 0, 0)");
+      context.fillStyle = survivorLight;
+      context.fillRect(startCenter.x - 92, startCenter.y - 92, 184, 184);
+
+      const exitLight = context.createRadialGradient(exitCenter.x, exitCenter.y, 4, exitCenter.x, exitCenter.y, 72);
+      exitLight.addColorStop(0, `${map.exit}${puzzleIsSolved() ? "55" : "20"}`);
+      exitLight.addColorStop(1, "rgba(0, 0, 0, 0)");
+      context.fillStyle = exitLight;
+      context.fillRect(exitCenter.x - 75, exitCenter.y - 75, 150, 150);
+      context.restore();
+    }
+
+    function drawPostFx() {
+      context.save();
+      const vignette = context.createRadialGradient(WIDTH / 2, HEIGHT / 2, 170, WIDTH / 2, HEIGHT / 2, 390);
+      vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+      vignette.addColorStop(0.72, "rgba(0, 0, 0, 0.08)");
+      vignette.addColorStop(1, "rgba(0, 0, 0, 0.5)");
+      context.fillStyle = vignette;
+      context.fillRect(0, 0, WIDTH, HEIGHT);
+      context.globalAlpha = 0.025;
+      context.fillStyle = "#ffffff";
+      for (let y = 2; y < HEIGHT; y += 9) context.fillRect(0, y, WIDTH, 1);
+      context.restore();
+    }
+
     function draw() {
       drawBackground();
-      if (puzzle) drawBoard();
+      drawGroundFog(false);
+      if (puzzle) {
+        drawBoard();
+        drawLighting();
+      }
+      drawGroundFog(true);
+      drawPostFx();
       drawMessage();
     }
 

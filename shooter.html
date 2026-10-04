@@ -493,10 +493,10 @@
       <a class="icon-button" href="./" aria-label="Back to game menu">‹</a>
       <div class="game-name">
         <strong>Star Defender</strong>
-        <span>Cartoon Space Patrol</span>
+        <span>Deep Space Intercept</span>
       </div>
-      <button class="icon-button coin-button" id="shop-button" type="button" aria-label="Open coin shop">🪙 <span id="coin-balance">0</span></button>
-      <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">🔊</button>
+      <button class="icon-button coin-button" id="shop-button" type="button" aria-label="Open coin shop">C <span id="coin-balance">0</span></button>
+      <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">SFX</button>
       <button class="icon-button" id="pause-button" type="button" aria-label="Pause game">Ⅱ</button>
     </header>
 
@@ -514,18 +514,18 @@
         </div>
         <div class="stat">
           <small>Hull</small>
-          <strong id="health">♥♥♥</strong>
+          <strong id="health">HP 3/3</strong>
         </div>
       </div>
 
       <div class="overlay visible" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panel-title">
         <div class="panel">
-          <span class="panel-icon" id="panel-icon" aria-hidden="true">🚀</span>
+          <span class="panel-icon" id="panel-icon" aria-hidden="true">SD</span>
           <h1 id="panel-title">Star Defender</h1>
           <p id="panel-message">Protect the galaxy from waves of goofy alien invaders.</p>
           <div class="instructions" id="instructions">
-            <div class="instruction"><b>☝️</b>Drag to fly</div>
-            <div class="instruction"><b>⚡</b>Lasers auto-fire</div>
+            <div class="instruction"><b>MOVE</b>Drag to fly</div>
+            <div class="instruction"><b>AUTO</b>Lasers auto-fire</div>
           </div>
           <button class="primary-button" id="action-button" type="button">Start Mission</button>
         </div>
@@ -538,9 +538,9 @@
               <h2 id="shop-title">Cosmic Shop</h2>
               <p>Collect coins during missions to unlock cosmetics.</p>
             </div>
-            <button class="close-shop" id="close-shop" type="button" aria-label="Close shop">✕</button>
+            <button class="close-shop" id="close-shop" type="button" aria-label="Close shop">X</button>
           </header>
-          <div class="shop-balance">🪙 <span id="shop-balance">0</span> coins available</div>
+          <div class="shop-balance">C <span id="shop-balance">0</span> available</div>
           <h3 class="shop-title">Ship skins</h3>
           <div class="shop-grid" id="skin-shop"></div>
           <h3 class="shop-title">Laser colors</h3>
@@ -549,7 +549,7 @@
       </div>
     </section>
 
-    <p class="hint">Drag anywhere · Collect 🪙 coins to unlock skins and lasers</p>
+    <p class="hint">Drag anywhere · Collect C coins to unlock skins and lasers</p>
   </main>
 
   <script>
@@ -567,7 +567,7 @@
         id: "nova",
         name: "Nova",
         price: 0,
-        icon: "🚀",
+        icon: "NV",
         wing: "#ff5d9e",
         bodyStart: "#f5fbff",
         bodyEnd: "#65dfff",
@@ -579,7 +579,7 @@
         id: "solar",
         name: "Solar Flare",
         price: 150,
-        icon: "☀️",
+        icon: "SF",
         wing: "#ff8c32",
         bodyStart: "#fff9c7",
         bodyEnd: "#ffc83d",
@@ -591,7 +591,7 @@
         id: "nebula",
         name: "Nebula",
         price: 350,
-        icon: "🌌",
+        icon: "NB",
         wing: "#a85dff",
         bodyStart: "#ffd8ff",
         bodyEnd: "#a66cff",
@@ -603,7 +603,7 @@
         id: "shadow",
         name: "Shadow X",
         price: 600,
-        icon: "🌑",
+        icon: "SX",
         wing: "#252b4d",
         bodyStart: "#9eabc9",
         bodyEnd: "#22283e",
@@ -791,7 +791,7 @@
       const name = document.createElement("strong");
       name.textContent = item.name;
       const status = document.createElement("small");
-      status.textContent = equipped ? "✓ Equipped" : unlocked ? "Tap to equip" : `🪙 ${item.price}`;
+      status.textContent = equipped ? "ACTIVE Equipped" : unlocked ? "Tap to equip" : `C ${item.price}`;
       button.append(preview, name, status);
       button.addEventListener("click", () => purchaseOrEquip(item, category, button));
       return button;
@@ -926,9 +926,7 @@
       scoreDisplay.textContent = score.toLocaleString();
       waveDisplay.textContent = String(wave);
       coinBalanceDisplay.textContent = coins.toLocaleString();
-      const fullHearts = "♥".repeat(Math.max(0, player.health));
-      const emptyHearts = "♡".repeat(Math.max(0, player.maximumHealth - player.health));
-      healthDisplay.textContent = fullHearts + emptyHearts;
+      healthDisplay.textContent = `HP ${Math.max(0, player.health)}/${player.maximumHealth}`;
     }
 
     function showOverlay(icon, title, message, buttonLabel, showInstructions = false) {
@@ -962,7 +960,7 @@
       state = "paused";
       pauseButton.textContent = "▶";
       pauseButton.setAttribute("aria-label", "Resume game");
-      showOverlay("⏸️", "Mission Paused", `Score: ${score.toLocaleString()} · Wave ${wave}`, "Resume Mission");
+      showOverlay("PAUSE", "Mission Paused", `Score: ${score.toLocaleString()} · Wave ${wave}`, "Resume Mission");
     }
 
     function resumeGame() {
@@ -991,7 +989,7 @@
       playTone(125, 0.45, "sine", 0.1, 0.2);
       vibrate([70, 40, 100]);
       showOverlay(
-        "🛸",
+        "END",
         "Mission Over",
         `Score: ${score.toLocaleString()} · Wave ${wave}. ${isNewBest ? "New high score!" : `Best: ${bestScore.toLocaleString()}.`}`,
         "Try Again"
@@ -1686,7 +1684,7 @@
     }
 
     function drawPowerUps() {
-      const symbols = { rapid: "⚡", shield: "🛡", heal: "♥", coin: "★" };
+      const symbols = { rapid: "R", shield: "S", heal: "+", coin: "C" };
       const colors = { rapid: "#ffd55b", shield: "#62eaff", heal: "#65f1a9", coin: "#ffd34e" };
       context.textAlign = "center";
       context.textBaseline = "middle";
@@ -1724,10 +1722,10 @@
     function drawPowerStatus() {
       const statuses = [];
       if (gameTime < player.rapidUntil) {
-        statuses.push(`⚡ ${Math.ceil(player.rapidUntil - gameTime)}s`);
+        statuses.push(`RAPID ${Math.ceil(player.rapidUntil - gameTime)}s`);
       }
       if (gameTime < player.shieldUntil) {
-        statuses.push(`🛡 ${Math.ceil(player.shieldUntil - gameTime)}s`);
+        statuses.push(`SHIELD ${Math.ceil(player.shieldUntil - gameTime)}s`);
       }
       if (statuses.length === 0) {
         return;
@@ -1877,7 +1875,7 @@
 
     soundButton.addEventListener("click", () => {
       soundEnabled = !soundEnabled;
-      soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+      soundButton.textContent = soundEnabled ? "SFX" : "MUTE";
       soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
       saveSoundSetting();
       if (soundEnabled) {
@@ -1898,11 +1896,11 @@
     initializeStars();
     resetGame();
     state = "start";
-    soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+    soundButton.textContent = soundEnabled ? "SFX" : "MUTE";
     soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
     renderShop();
     showOverlay(
-      "🚀",
+      "SD",
       "Star Defender",
       `Protect the galaxy from goofy invaders. High score: ${bestScore.toLocaleString()} · Coins: ${coins.toLocaleString()}.`,
       "Start Mission",

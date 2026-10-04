@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Pocket Arcade is a collection of four polished, touch-first games that work online and offline.">
-  <meta name="theme-color" content="#080b18">
+  <meta name="description" content="Pocket Arcade Nightshift is a collection of four original, touch-first games built for instant and offline play.">
+  <meta name="theme-color" content="#050608">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Pocket Arcade">
@@ -13,90 +13,105 @@
   <link rel="stylesheet" href="arcade.css">
   <script src="register-sw.js" defer></script>
   <script src="arcade-ui.js" defer></script>
-  <title>Pocket Arcade — Four Games, One Pocket</title>
+  <title>Pocket Arcade Nightshift</title>
 </head>
 <body data-theme="home">
   <main class="arcade-home">
     <nav class="home-nav" aria-label="Pocket Arcade status">
       <div class="mini-brand">
-        <span class="mini-brand-mark" aria-hidden="true">✦</span>
-        <span>Pocket Arcade</span>
+        <svg class="mini-brand-mark" aria-hidden="true"><use href="sprites.svg#brand"></use></svg>
+        <span>POCKET/ARCADE</span>
       </div>
       <div class="connection-pill">
         <span class="connection-dot" aria-hidden="true"></span>
-        <span>Offline ready</span>
+        <span>UNIT ONLINE</span>
       </div>
     </nav>
 
     <header class="home-hero">
-      <span class="eyebrow">Season 01 · Four original games</span>
-      <h1>Big play.<br><span class="gradient-word">Small screen.</span></h1>
+      <div class="hero-code" aria-hidden="true">FIELD UNIT 001 / NIGHTSHIFT BUILD</div>
+      <span class="eyebrow">NO LOGIN / NO FEED / NO WAIT</span>
+      <h1>PLAY LIKE<br><span class="gradient-word">YOU MEAN IT.</span></h1>
       <p class="hero-copy">
-        A touch-first arcade built for quick runs, clever puzzles, high scores, and offline play. No downloads, no accounts—just pick a game and start.
+        Four original games tuned for one thumb, short breaks, and the dangerous decision to play one more round.
       </p>
-      <div class="hero-stats" aria-label="Arcade features">
-        <span class="hero-stat">🎮 4 games</span>
-        <span class="hero-stat">☝️ Touch optimized</span>
-        <span class="hero-stat">⚡ Instant loading</span>
-        <span class="hero-stat">☁️ Plays offline</span>
+      <div class="hero-stats" aria-label="Arcade specifications">
+        <span class="hero-stat"><b>04</b> TITLES</span>
+        <span class="hero-stat"><b id="total-plays">00</b> SESSIONS</span>
+        <span class="hero-stat"><b>01</b> TAP TO PLAY</span>
+        <span class="hero-stat"><b>24/7</b> OFFLINE</span>
       </div>
+      <a class="continue-game" id="continue-game" href="runner.html" hidden>
+        <span>RESUME LAST PROGRAM</span>
+        <strong id="continue-label">RUINS RUSH</strong>
+      </a>
     </header>
+
+    <div class="signal-strip" aria-hidden="true">
+      <div class="signal-track">
+        <span>MEMORY UNDER PRESSURE</span><i></i><span>ALIENS ON APPROACH</span><i></i><span>ROUTES COMPROMISED</span><i></i><span>THE RUINS NEVER END</span><i></i>
+        <span>MEMORY UNDER PRESSURE</span><i></i><span>ALIENS ON APPROACH</span><i></i><span>ROUTES COMPROMISED</span><i></i><span>THE RUINS NEVER END</span><i></i>
+      </div>
+    </div>
 
     <section class="games-section" aria-labelledby="games-title">
       <div class="section-heading">
-        <h2 id="games-title">Choose your game</h2>
-        <p>Progress saves on this device</p>
+        <div>
+          <span class="section-kicker">SELECT PROGRAM</span>
+          <h2 id="games-title">Four ways in.</h2>
+        </div>
+        <p>Local progress / instant resume</p>
       </div>
 
       <nav class="games" aria-label="Available games">
-        <a class="game-card matching" href="matching.html">
-          <div class="game-icon" aria-hidden="true">🐶</div>
+        <a class="game-card matching" data-index="01" data-game-id="matching" href="matching.html">
+          <div class="game-icon" aria-hidden="true"><svg><use href="sprites.svg#game-match"></use></svg></div>
           <div class="game-copy">
-            <span class="game-genre">Memory · Relaxed</span>
+            <span class="game-genre">MEMORY / PRECISION</span>
             <h2>Critter Match</h2>
-            <p>Flip the deck, remember each critter, and clear all eight pairs in the fewest moves.</p>
+            <p>Read the deck. Hold the pattern. Clear every pair before your memory slips.</p>
             <div class="card-footer">
-              <span class="best" id="match-best">No record yet</span>
-              <span class="play" aria-hidden="true">PLAY →</span>
+              <span class="best" id="match-best">NO RECORD</span>
+              <span class="play" aria-hidden="true">ENTER</span>
             </div>
           </div>
         </a>
 
-        <a class="game-card shooter" href="shooter.html">
-          <div class="game-icon" aria-hidden="true">🚀</div>
+        <a class="game-card shooter" data-index="02" data-game-id="shooter" href="shooter.html">
+          <div class="game-icon" aria-hidden="true"><svg><use href="sprites.svg#game-space"></use></svg></div>
           <div class="game-copy">
-            <span class="game-genre">Action · Survival</span>
+            <span class="game-genre">ARCADE / SURVIVAL</span>
             <h2>Star Defender</h2>
-            <p>Fly through alien waves, defeat massive bosses, and unlock ship and laser cosmetics.</p>
+            <p>Thread the swarm. Break the bosses. Build a ship nobody else is flying.</p>
             <div class="card-footer">
-              <span class="best" id="shooter-best">Score 0 · 🪙 0</span>
-              <span class="play" aria-hidden="true">PLAY →</span>
+              <span class="best" id="shooter-best">SCORE 0 / C 0</span>
+              <span class="play" aria-hidden="true">ENTER</span>
             </div>
           </div>
         </a>
 
-        <a class="game-card zombie" href="zombie.html">
-          <div class="game-icon" aria-hidden="true">🧟</div>
+        <a class="game-card zombie" data-index="03" data-game-id="zombie" href="zombie.html">
+          <div class="game-icon" aria-hidden="true"><svg><use href="sprites.svg#game-zombie"></use></svg></div>
           <div class="game-copy">
-            <span class="game-genre">Puzzle · Strategy</span>
+            <span class="game-genre">PUZZLE / ESCAPE</span>
             <h2>Zombie Escape</h2>
-            <p>Rotate roads, connect a safe route, and customize your survivor, weapon, and map.</p>
+            <p>Rotate the city beneath your feet. One connected route is the difference.</p>
             <div class="card-footer">
-              <span class="best" id="zombie-best">Level 1 · 🪙 0</span>
-              <span class="play" aria-hidden="true">PLAY →</span>
+              <span class="best" id="zombie-best">LEVEL 1 / C 0</span>
+              <span class="play" aria-hidden="true">ENTER</span>
             </div>
           </div>
         </a>
 
-        <a class="game-card runner" href="runner.html">
-          <div class="game-icon" aria-hidden="true">🏃</div>
+        <a class="game-card runner" data-index="04" data-game-id="runner" href="runner.html">
+          <div class="game-icon" aria-hidden="true"><svg><use href="sprites.svg#game-runner"></use></svg></div>
           <div class="game-copy">
-            <span class="game-genre">Runner · Reflex</span>
+            <span class="game-genre">RUNNER / REFLEX</span>
             <h2>Ruins Rush</h2>
-            <p>Swipe through jungle ruins, read the path ahead, chain combos, and chase distance records.</p>
+            <p>Read the warning. Commit to the lane. Keep the combo alive for one more run.</p>
             <div class="card-footer">
-              <span class="best" id="runner-best">Best 0 m · 🪙 0</span>
-              <span class="play" aria-hidden="true">PLAY →</span>
+              <span class="best" id="runner-best">BEST 0 M / C 0</span>
+              <span class="play" aria-hidden="true">ENTER</span>
             </div>
           </div>
         </a>
@@ -104,16 +119,17 @@
     </section>
 
     <aside class="install-card" aria-label="Install Pocket Arcade">
-      <span class="install-icon" aria-hidden="true">↗</span>
+      <span class="install-icon" aria-hidden="true">PA</span>
       <div>
-        <h2>Keep the arcade one tap away</h2>
-        <p>On iPhone, open Safari’s Share menu and choose <strong>Add to Home Screen</strong>. Your progress stays on this device.</p>
+        <span class="section-kicker">FIELD INSTALL</span>
+        <h2>Put the unit on your home screen.</h2>
+        <p>Open Safari Share, choose <strong>Add to Home Screen</strong>, and the full arcade stays one tap away—even when the signal disappears.</p>
       </div>
     </aside>
 
     <footer class="home-footer">
-      <span>Built for touch, keyboard, and offline play.</span>
-      <span>v1.0</span>
+      <span>ORIGINAL GAMES / LOCAL SAVES / ZERO TRACKING</span>
+      <span>BUILD 0010</span>
     </footer>
   </main>
 
@@ -144,13 +160,13 @@
       const matchScore = readJson("critter-match-best-v1", null);
       document.getElementById("match-best").textContent =
         matchScore && Number.isInteger(matchScore.moves)
-          ? `${matchScore.moves} moves · ${Math.floor(matchScore.time / 60)}:${String(matchScore.time % 60).padStart(2, "0")}`
-          : "No record yet";
+          ? `${matchScore.moves} MOVES / ${Math.floor(matchScore.time / 60)}:${String(matchScore.time % 60).padStart(2, "0")}`
+          : "NO RECORD";
 
       const shooterScore = readInteger("star-defender-best-v1");
       const shooterCoins = readInteger("star-defender-coins-v1");
       document.getElementById("shooter-best").textContent =
-        `Score ${shooterScore.toLocaleString()} · 🪙 ${shooterCoins.toLocaleString()}`;
+        `SCORE ${shooterScore.toLocaleString()} / C ${shooterCoins.toLocaleString()}`;
 
       const zombieCoins = readInteger("zombie-escape-coins-v1");
       const zombieProgress = readJson("zombie-puzzle-progress-v1", { unlockedLevel: 1 });
@@ -158,12 +174,32 @@
         ? Math.max(1, Math.min(30, zombieProgress.unlockedLevel))
         : 1;
       document.getElementById("zombie-best").textContent =
-        `Level ${zombieLevel} · 🪙 ${zombieCoins.toLocaleString()}`;
+        `LEVEL ${zombieLevel} / C ${zombieCoins.toLocaleString()}`;
 
       const runnerDistance = readInteger("ruins-rush-best-v1");
       const runnerCoins = readInteger("ruins-rush-coins-v1");
       document.getElementById("runner-best").textContent =
-        `Best ${runnerDistance.toLocaleString()} m · 🪙 ${runnerCoins.toLocaleString()}`;
+        `BEST ${runnerDistance.toLocaleString()} M / C ${runnerCoins.toLocaleString()}`;
+
+      const plays = readInteger("pocket-arcade-plays-v1");
+      document.getElementById("total-plays").textContent = String(plays).padStart(2, "0");
+      try {
+        const lastGame = localStorage.getItem("pocket-arcade-last-game-v1");
+        const games = {
+          matching: { name: "CRITTER MATCH", url: "matching.html" },
+          shooter: { name: "STAR DEFENDER", url: "shooter.html" },
+          zombie: { name: "ZOMBIE ESCAPE", url: "zombie.html" },
+          runner: { name: "RUINS RUSH", url: "runner.html" }
+        };
+        if (lastGame && games[lastGame]) {
+          const continueLink = document.getElementById("continue-game");
+          continueLink.href = games[lastGame].url;
+          continueLink.hidden = false;
+          document.getElementById("continue-label").textContent = games[lastGame].name;
+        }
+      } catch (error) {
+        console.warn("Last-played game could not be loaded.", error);
+      }
     }
 
     loadScores();

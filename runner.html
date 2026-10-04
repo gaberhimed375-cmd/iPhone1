@@ -346,10 +346,10 @@
       <a class="icon-button" href="./" aria-label="Back to game menu">‹</a>
       <div class="game-name">
         <strong>Ruins Rush</strong>
-        <span>Jungle Runner</span>
+        <span>Endless Field Test</span>
       </div>
-      <div class="icon-button coin-display" aria-label="Collected coins">🪙 <span id="total-coins">0</span></div>
-      <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">🔊</button>
+      <div class="icon-button coin-display" aria-label="Collected coins">C <span id="total-coins">0</span></div>
+      <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">SFX</button>
       <button class="icon-button" id="pause-button" type="button" aria-label="Pause run" disabled>Ⅱ</button>
     </header>
 
@@ -378,12 +378,12 @@
 
       <div class="overlay visible" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panel-title">
         <div class="panel">
-          <span class="panel-icon" id="panel-icon" aria-hidden="true">🏃</span>
+          <span class="panel-icon" id="panel-icon" aria-hidden="true">RR</span>
           <h1 id="panel-title">Ruins Rush</h1>
           <p id="panel-message">Race through ancient jungle ruins and collect every coin you can.</p>
           <div class="instructions" id="instructions">
-            <div class="instruction"><b>↔️</b>Swipe to switch lanes</div>
-            <div class="instruction"><b>⬆️⬇️</b>Jump or slide</div>
+            <div class="instruction"><b>LANE</b>Swipe to switch lanes</div>
+            <div class="instruction"><b>MOVE</b>Jump or slide</div>
           </div>
           <button class="primary-button" id="action-button" type="button">Start Running</button>
         </div>
@@ -650,7 +650,7 @@
       pauseButton.textContent = "▶";
       pauseButton.setAttribute("aria-label", "Resume run");
       saveProgress();
-      showOverlay("⏸️", "Run Paused", `${Math.floor(distance).toLocaleString()} m · Score ${score.toLocaleString()}.`, "Keep Running");
+      showOverlay("PAUSE", "Run Paused", `${Math.floor(distance).toLocaleString()} m · Score ${score.toLocaleString()}.`, "Keep Running");
     }
 
     function resumeGame() {
@@ -677,7 +677,7 @@
       playTone(90, 0.4, "sine", 0.08, 0.18);
       vibrate([70, 40, 90]);
       showOverlay(
-        "🏛️",
+        "END",
         "Run Ended!",
         `${finalDistance.toLocaleString()} m · Score ${score.toLocaleString()} · ${runCoins.toLocaleString()} coins.${newDistanceBest || newScoreBest ? " New record!" : ` Best: ${bestDistance.toLocaleString()} m.`}`,
         "Run Again"
@@ -749,7 +749,7 @@
           lane: blockedLane,
           progress: -0.08,
           handled: false,
-          telegraph: type === "arch" ? "↓" : type === "barrier" ? "↑" : "↔"
+          telegraph: type === "arch" ? "D" : type === "barrier" ? "U" : "X"
         });
       }
 
@@ -1177,12 +1177,12 @@
       context.font = "900 11px system-ui";
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillText("★", 0, 1);
+      context.fillText("C", 0, 1);
       context.restore();
     }
 
     function drawPower(object, x, y, scale) {
-      const symbols = { shield: "◆", magnet: "U", double: "2×" };
+      const symbols = { shield: "S", magnet: "M", double: "2X" };
       const colors = { shield: "#62eaff", magnet: "#ff6ca8", double: "#b9f568" };
       context.save();
       context.translate(x, y - 15 * scale + Math.sin(object.phase) * 3 * scale);
@@ -1348,9 +1348,9 @@
 
     function drawStatus() {
       const statuses = [];
-      if (shield) statuses.push("◆ SHIELD");
-      if (gameTime < magnetUntil) statuses.push(`U ${Math.ceil(magnetUntil - gameTime)}s`);
-      if (gameTime < doubleUntil) statuses.push(`2× ${Math.ceil(doubleUntil - gameTime)}s`);
+      if (shield) statuses.push("S SHIELD");
+      if (gameTime < magnetUntil) statuses.push(`M ${Math.ceil(magnetUntil - gameTime)}s`);
+      if (gameTime < doubleUntil) statuses.push(`2X ${Math.ceil(doubleUntil - gameTime)}s`);
       if (statuses.length === 0) return;
       context.font = "900 11px ui-rounded, system-ui";
       context.textAlign = "center";
@@ -1479,7 +1479,7 @@
 
     soundButton.addEventListener("click", () => {
       soundEnabled = !soundEnabled;
-      soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+      soundButton.textContent = soundEnabled ? "SFX" : "MUTE";
       soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
       saveProgress();
       if (soundEnabled) {
@@ -1499,10 +1499,10 @@
     configureCanvas();
     resetGame();
     state = "start";
-    soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+    soundButton.textContent = soundEnabled ? "SFX" : "MUTE";
     soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
     showOverlay(
-      "🏃",
+      "RR",
       "Ruins Rush",
       `Race through original jungle ruins. Best: ${bestDistance.toLocaleString()} m · Score ${bestScore.toLocaleString()} · Coins: ${totalCoins.toLocaleString()}.`,
       "Start Running",

@@ -509,10 +509,10 @@
       <a class="icon-button" href="./" aria-label="Back to game menu">‹</a>
       <div class="game-name">
         <strong>Zombie Escape</strong>
-        <span>Path Puzzle</span>
+        <span>Route Recovery</span>
       </div>
-      <button class="icon-button coin-display" id="shop-button" type="button" aria-label="Open survivor shop">🪙 <span id="coins">0</span></button>
-      <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">🔊</button>
+      <button class="icon-button coin-display" id="shop-button" type="button" aria-label="Open survivor shop">C <span id="coins">0</span></button>
+      <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off">SFX</button>
     </header>
 
     <section class="arena" aria-label="Zombie Escape path puzzle">
@@ -535,14 +535,14 @@
 
       <div class="overlay visible" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panel-title">
         <div class="panel">
-          <span class="panel-icon" id="panel-icon" aria-hidden="true">🧩</span>
+          <span class="panel-icon" id="panel-icon" aria-hidden="true">ZE</span>
           <h1 id="panel-title">Zombie Escape</h1>
           <p id="panel-message">Rotate the road tiles to build a safe route through the zombie-filled block.</p>
           <div class="instructions" id="instructions">
-            <div class="instruction"><b>👆</b>Tap roads to rotate</div>
-            <div class="instruction"><b>🚪</b>Connect hero to exit</div>
+            <div class="instruction"><b>TURN</b>Tap roads to rotate</div>
+            <div class="instruction"><b>LINK</b>Connect hero to exit</div>
           </div>
-          <span class="stars" id="result-stars" hidden>★★★</span>
+          <span class="stars" id="result-stars" hidden>3/3</span>
           <button class="primary-button" id="action-button" type="button">Start Puzzle</button>
         </div>
       </div>
@@ -554,9 +554,9 @@
               <h2 id="shop-title">Survivor Shop</h2>
               <p>Use puzzle coins to unlock and equip new gear.</p>
             </div>
-            <button class="close-shop" id="close-shop" type="button" aria-label="Close shop">✕</button>
+            <button class="close-shop" id="close-shop" type="button" aria-label="Close shop">X</button>
           </header>
-          <div class="shop-balance">🪙 <span id="shop-coins">0</span> coins available</div>
+          <div class="shop-balance">C <span id="shop-coins">0</span> available</div>
           <h3 class="shop-title">Survivor skins</h3>
           <div class="shop-grid" id="skin-shop"></div>
           <h3 class="shop-title">Weapons</h3>
@@ -570,7 +570,7 @@
     <div class="controls" aria-label="Puzzle controls">
       <button class="control-button" id="undo-button" type="button">↶ Undo</button>
       <button class="control-button" id="reset-button" type="button">↻ Reset</button>
-      <button class="control-button" id="hint-button" type="button">💡 Hint · 🪙3</button>
+      <button class="control-button" id="hint-button" type="button">HINT Hint · C3</button>
     </div>
     <p class="hint">Green roads are connected · Zombies block unsafe tiles · First clears earn coins</p>
   </main>
@@ -592,43 +592,43 @@
     const SHOP_KEY = "zombie-puzzle-shop-v1";
 
     const SURVIVOR_SKINS = [
-      { id: "rookie", name: "Rookie", price: 0, icon: "🧑", body: "#4f86e8", outline: "#24395f", skin: "#efbd8d", hair: "#342d32" },
-      { id: "medic", name: "Medic", price: 120, icon: "🧑‍⚕️", body: "#f2f5ed", outline: "#b63d58", skin: "#d99a72", hair: "#4b2e28" },
-      { id: "ranger", name: "Ranger", price: 300, icon: "🥷", body: "#4c7f4e", outline: "#203f2a", skin: "#9f6c4e", hair: "#1d2820" },
-      { id: "neon", name: "Neon Hero", price: 550, icon: "🦸", body: "#9b5cff", outline: "#3a1c6b", skin: "#f0b68d", hair: "#55f1d2" }
+      { id: "rookie", name: "Rookie", price: 0, icon: "RK", body: "#4f86e8", outline: "#24395f", skin: "#efbd8d", hair: "#342d32" },
+      { id: "medic", name: "Medic", price: 120, icon: "MD", body: "#f2f5ed", outline: "#b63d58", skin: "#d99a72", hair: "#4b2e28" },
+      { id: "ranger", name: "Ranger", price: 300, icon: "RG", body: "#4c7f4e", outline: "#203f2a", skin: "#9f6c4e", hair: "#1d2820" },
+      { id: "neon", name: "Neon Hero", price: 550, icon: "NH", body: "#9b5cff", outline: "#3a1c6b", skin: "#f0b68d", hair: "#55f1d2" }
     ];
 
     const WEAPONS = [
-      { id: "flashlight", name: "Flashlight", price: 0, icon: "🔦", type: "flashlight", color: "#ffd96b", accent: "#8c681f", hintCost: 3 },
-      { id: "bat", name: "Slugger Bat", price: 140, icon: "🏏", type: "bat", color: "#b77a45", accent: "#5c3823", hintCost: 2 },
-      { id: "blaster", name: "Foam Blaster", price: 320, icon: "🔫", type: "blaster", color: "#62eaff", accent: "#2860b8", hintCost: 2 },
-      { id: "plasma", name: "Plasma Blade", price: 650, icon: "⚔️", type: "plasma", color: "#ff69ce", accent: "#8c2bc7", hintCost: 1 }
+      { id: "flashlight", name: "Flashlight", price: 0, icon: "FL", type: "flashlight", color: "#ffd96b", accent: "#8c681f", hintCost: 3 },
+      { id: "bat", name: "Slugger Bat", price: 140, icon: "BT", type: "bat", color: "#b77a45", accent: "#5c3823", hintCost: 2 },
+      { id: "blaster", name: "Foam Blaster", price: 320, icon: "FB", type: "blaster", color: "#62eaff", accent: "#2860b8", hintCost: 2 },
+      { id: "plasma", name: "Plasma Blade", price: 650, icon: "PB", type: "plasma", color: "#ff69ce", accent: "#8c2bc7", hintCost: 1 }
     ];
 
     const MAPS = [
       {
-        id: "street", name: "Night Street", price: 0, icon: "🌃",
+        id: "street", name: "Night Street", price: 0, icon: "NS",
         top: "#142b29", bottom: "#252b2e", grid: "rgba(203, 225, 193, 0.06)",
         tile: "#3b4141", tileConnected: "#315d43", border: "#5f6966", borderConnected: "#7bd661",
         road: "#9aa49c", roadConnected: "#77d969", lane: "#d7d0aa", laneConnected: "#c8f39b",
         block: "#202b2a", zombie: "#78bd58", rubble: "#5c6663", exit: "#b8fb7e"
       },
       {
-        id: "lab", name: "Toxic Lab", price: 220, icon: "🧪",
+        id: "lab", name: "Toxic Lab", price: 220, icon: "TL",
         top: "#102c35", bottom: "#163f3c", grid: "rgba(102, 245, 255, 0.09)",
         tile: "#284249", tileConnected: "#235969", border: "#58747b", borderConnected: "#5ee8ff",
         road: "#8ca7aa", roadConnected: "#42d8e8", lane: "#d2f5ee", laneConnected: "#b9ffff",
         block: "#172f35", zombie: "#84dc58", rubble: "#49747a", exit: "#6ef2ff"
       },
       {
-        id: "graveyard", name: "Moon Graveyard", price: 450, icon: "🌙",
+        id: "graveyard", name: "Moon Graveyard", price: 450, icon: "MG",
         top: "#1a1c35", bottom: "#343047", grid: "rgba(208, 199, 255, 0.07)",
         tile: "#454452", tileConnected: "#4a3e64", border: "#69687a", borderConnected: "#bb91ff",
         road: "#9994a8", roadConnected: "#9d74dc", lane: "#d8cfbd", laneConnected: "#ead2ff",
         block: "#29283a", zombie: "#8bb86d", rubble: "#6f6b7d", exit: "#c9a7ff"
       },
       {
-        id: "neon", name: "Neon City", price: 800, icon: "🌆",
+        id: "neon", name: "Neon City", price: 800, icon: "NC",
         top: "#171238", bottom: "#3b1650", grid: "rgba(255, 102, 219, 0.1)",
         tile: "#302c55", tileConnected: "#423070", border: "#625e89", borderConnected: "#ff66d7",
         road: "#8580ac", roadConnected: "#d452c7", lane: "#bdefff", laneConnected: "#70f5ff",
@@ -804,7 +804,7 @@
       const name = document.createElement("strong");
       name.textContent = item.name;
       const status = document.createElement("small");
-      status.textContent = equipped ? "✓ Equipped" : unlocked ? "Tap to equip" : `🪙 ${item.price}`;
+      status.textContent = equipped ? "ACTIVE Equipped" : unlocked ? "Tap to equip" : `C ${item.price}`;
       button.append(preview, name, status);
       button.addEventListener("click", () => purchaseOrEquip(item, category, button));
       return button;
@@ -1111,7 +1111,7 @@
 
       if (showIntro) {
         showOverlay(
-          "🧩",
+          "ZE",
           "Zombie Escape",
           "Tap road tiles to rotate them. Build one safe connected path from the survivor to the exit while zombies block the other spaces.",
           "Start Puzzle",
@@ -1126,9 +1126,9 @@
       levelDisplay.textContent = `${currentLevel}/${MAX_LEVEL}`;
       movesDisplay.textContent = String(moves);
       coinsDisplay.textContent = coins.toLocaleString();
-      hintButton.textContent = `💡 Hint · 🪙${getEquippedWeapon().hintCost}`;
+      hintButton.textContent = `HINT Hint · C${getEquippedWeapon().hintCost}`;
       const record = progress.completed[String(currentLevel)];
-      bestDisplay.textContent = record ? `${record.bestMoves} · ${"★".repeat(record.stars)}` : `Par ${puzzle.parMoves}`;
+      bestDisplay.textContent = record ? `${record.bestMoves} / ${record.stars}S` : `Par ${puzzle.parMoves}`;
       undoButton.disabled = state !== "playing" || history.length === 0;
       resetButton.disabled = state !== "playing";
       hintButton.disabled = state !== "playing";
@@ -1141,7 +1141,7 @@
       actionButton.textContent = buttonLabel;
       instructions.hidden = !showInstructions;
       resultStars.hidden = stars === 0;
-      resultStars.textContent = "★".repeat(stars) + "☆".repeat(3 - stars);
+      resultStars.textContent = `${stars}/3`;
       overlay.classList.add("visible");
     }
 
@@ -1192,7 +1192,7 @@
       saveProgress();
       updateInterface();
       showOverlay(
-        "🚪",
+        "OUT",
         "Safe Route Found!",
         `${moves} moves · Par ${puzzle.parMoves}.${reward > 0 ? ` First-clear reward: ${reward} coins.` : " Level already rewarded."}`,
         currentLevel < MAX_LEVEL ? "Next Puzzle" : "Replay Puzzle",
@@ -1358,7 +1358,7 @@
         context.font = "900 8px system-ui";
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.fillText("★", 0, 1);
+        context.fillText("C", 0, 1);
       }
 
       context.restore();
@@ -1655,7 +1655,7 @@
 
     soundButton.addEventListener("click", () => {
       soundEnabled = !soundEnabled;
-      soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+      soundButton.textContent = soundEnabled ? "SFX" : "MUTE";
       soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
       saveProgress();
       if (soundEnabled) {
@@ -1668,7 +1668,7 @@
 
     configureCanvas();
     loadLevel(currentLevel, true);
-    soundButton.textContent = soundEnabled ? "🔊" : "🔇";
+    soundButton.textContent = soundEnabled ? "SFX" : "MUTE";
     soundButton.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
     renderShop();
     window.requestAnimationFrame(gameLoop);

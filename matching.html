@@ -355,7 +355,7 @@
 
   <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="win-title">
     <section class="win-panel">
-      <span class="trophy" aria-hidden="true">🏆</span>
+      <span class="trophy" aria-hidden="true"><svg class="vector-icon"><use href="sprites.svg#trophy"></use></svg></span>
       <h2 id="win-title">You Did It!</h2>
       <p id="result">All the critters found their friends.</p>
       <button class="play-again" id="play-again" type="button">Play Again</button>
@@ -365,7 +365,16 @@
   <script>
     "use strict";
 
-    const ANIMALS = ["🐶", "🐱", "🐼", "🦊", "🐸", "🐵", "🦁", "🐰"];
+    const ANIMALS = [
+      "animal-dog",
+      "animal-cat",
+      "animal-panda",
+      "animal-fox",
+      "animal-frog",
+      "animal-monkey",
+      "animal-lion",
+      "animal-rabbit"
+    ];
     const STORAGE_KEY = "critter-match-best-v1";
 
     const board = document.getElementById("board");
@@ -507,12 +516,14 @@
 
     function createCard(animal, index) {
       const card = document.createElement("button");
+      const animalName = animal.replace("animal-", "");
 
       card.type = "button";
       card.className = "card";
       card.dataset.animal = animal;
+      card.dataset.label = animalName;
       card.dataset.index = String(index);
-      card.setAttribute("aria-label", "Hidden cartoon card");
+      card.setAttribute("aria-label", "Hidden creature card");
       card.setAttribute("aria-pressed", "false");
 
       const back = document.createElement("span");
@@ -523,7 +534,12 @@
       const front = document.createElement("span");
       front.className = "card-face card-front";
       front.setAttribute("aria-hidden", "true");
-      front.textContent = animal;
+      const artwork = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      artwork.classList.add("critter-art");
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttribute("href", `sprites.svg#${animal}`);
+      artwork.append(use);
+      front.append(artwork);
 
       card.append(back, front);
       card.addEventListener("click", handleCardClick);
@@ -533,13 +549,13 @@
     function flipCard(card) {
       card.classList.add("flipped");
       card.setAttribute("aria-pressed", "true");
-      card.setAttribute("aria-label", `Revealed card: ${card.dataset.animal}`);
+      card.setAttribute("aria-label", `Revealed creature: ${card.dataset.label}`);
     }
 
     function hideCard(card) {
       card.classList.remove("flipped");
       card.setAttribute("aria-pressed", "false");
-      card.setAttribute("aria-label", "Hidden cartoon card");
+      card.setAttribute("aria-label", "Hidden creature card");
     }
 
     function resetSelection() {

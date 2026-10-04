@@ -1,7 +1,7 @@
 "use strict";
 
 const CACHE_PREFIX = "pocket-arcade-";
-const CACHE_NAME = `${CACHE_PREFIX}v9`;
+const CACHE_NAME = `${CACHE_PREFIX}v10`;
 const APP_FILES = [
   "./",
   "./index.html",
@@ -13,7 +13,8 @@ const APP_FILES = [
   "./arcade-ui.js",
   "./manifest.webmanifest",
   "./register-sw.js",
-  "./icon.svg"
+  "./icon.svg",
+  "./sprites.svg"
 ];
 const APP_PATHS = new Set(
   APP_FILES.map((file) => new URL(file, self.registration.scope).pathname)

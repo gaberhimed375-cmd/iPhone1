@@ -16,7 +16,7 @@
   }
 
   function syncSoundButton(button) {
-    const enabled = button.textContent.includes("🔊");
+    const enabled = button.textContent.trim() === "SFX";
     button.setAttribute("aria-pressed", String(enabled));
   }
 
@@ -34,9 +34,44 @@
     toastTimer = window.setTimeout(() => toast.classList.remove("visible"), 3200);
   }
 
+  function setupCardMotion() {
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const cards = document.querySelectorAll(".game-card");
+
+    for (const card of cards) {
+      if (finePointer && !reducedMotion) {
+        card.addEventListener("pointermove", (event) => {
+          const bounds = card.getBoundingClientRect();
+          const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+          const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+          card.style.setProperty("--ry", `${horizontal * 5}deg`);
+          card.style.setProperty("--rx", `${vertical * -5}deg`);
+        });
+        card.addEventListener("pointerleave", () => {
+          card.style.setProperty("--ry", "0deg");
+          card.style.setProperty("--rx", "0deg");
+        });
+      }
+
+      card.addEventListener("click", () => {
+        const gameId = card.dataset.gameId;
+        if (!gameId) return;
+        try {
+          localStorage.setItem("pocket-arcade-last-game-v1", gameId);
+          const plays = Number.parseInt(localStorage.getItem("pocket-arcade-plays-v1"), 10) || 0;
+          localStorage.setItem("pocket-arcade-plays-v1", String(plays + 1));
+        } catch (error) {
+          console.warn("Play history could not be saved.", error);
+        }
+      });
+    }
+  }
+
   function initializeUi() {
     document.querySelectorAll(overlaySelector).forEach(syncOverlay);
     document.querySelectorAll(soundSelector).forEach(syncSoundButton);
+    setupCardMotion();
 
     const observer = new MutationObserver((records) => {
       for (const record of records) {

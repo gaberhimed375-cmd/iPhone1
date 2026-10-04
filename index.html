@@ -134,6 +134,14 @@
         linear-gradient(145deg, #1d245c, #5b36a5 58%, #d54f98);
     }
 
+    .zombie {
+      color: var(--white);
+      background:
+        radial-gradient(circle at 86% 22%, rgba(171, 255, 121, 0.24) 0 8%, transparent 9%),
+        radial-gradient(circle at 18% 78%, rgba(255, 194, 91, 0.18) 0 12%, transparent 13%),
+        linear-gradient(145deg, #162b29, #315e45 55%, #50334f);
+    }
+
     .game-icon {
       display: grid;
       place-items: center;
@@ -148,6 +156,10 @@
 
     .shooter .game-icon {
       background: rgba(50, 232, 255, 0.15);
+    }
+
+    .zombie .game-icon {
+      background: rgba(145, 236, 98, 0.17);
     }
 
     .game-copy {
@@ -169,7 +181,8 @@
       line-height: 1.35;
     }
 
-    .shooter .game-copy p {
+    .shooter .game-copy p,
+    .zombie .game-copy p {
       color: #dce4ff;
     }
 
@@ -189,6 +202,11 @@
       color: #dffcff;
     }
 
+    .zombie .best {
+      background: rgba(151, 239, 108, 0.17);
+      color: #eaffdf;
+    }
+
     .play {
       display: grid;
       place-items: center;
@@ -205,6 +223,12 @@
       color: #18204e;
       background: #57edff;
       box-shadow: 0 4px 0 #1a9eb6;
+    }
+
+    .zombie .play {
+      color: #183520;
+      background: #9af06d;
+      box-shadow: 0 4px 0 #3f944b;
     }
 
     footer {
@@ -269,9 +293,19 @@
         </div>
         <span class="play" aria-hidden="true">▶</span>
       </a>
+
+      <a class="game-card zombie" href="zombie.html">
+        <div class="game-icon" aria-hidden="true">🧟</div>
+        <div class="game-copy">
+          <h2>Zombie Escape</h2>
+          <p>Clear each block, collect supplies, and reach the exit.</p>
+          <span class="best" id="zombie-best">High score: 0 · 🪙 0</span>
+        </div>
+        <span class="play" aria-hidden="true">▶</span>
+      </a>
     </nav>
 
-    <footer>Two games · Touch controls · Plays offline after loading</footer>
+    <footer>Three games · Touch controls · Plays offline after loading</footer>
   </main>
 
   <script>
@@ -290,6 +324,13 @@
         const safeCoins = Number.isFinite(shooterCoins) && shooterCoins > 0 ? shooterCoins : 0;
         document.getElementById("shooter-best").textContent =
           `High score: ${safeScore.toLocaleString()} · 🪙 ${safeCoins.toLocaleString()}`;
+
+        const zombieScore = Number.parseInt(localStorage.getItem("zombie-escape-best-v1"), 10);
+        const zombieCoins = Number.parseInt(localStorage.getItem("zombie-escape-coins-v1"), 10);
+        const safeZombieScore = Number.isFinite(zombieScore) && zombieScore > 0 ? zombieScore : 0;
+        const safeZombieCoins = Number.isFinite(zombieCoins) && zombieCoins > 0 ? zombieCoins : 0;
+        document.getElementById("zombie-best").textContent =
+          `High score: ${safeZombieScore.toLocaleString()} · 🪙 ${safeZombieCoins.toLocaleString()}`;
       } catch (error) {
         console.warn("Saved scores could not be loaded.", error);
       }

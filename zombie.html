@@ -184,7 +184,7 @@
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 7px;
       padding-top: 9px;
     }
@@ -568,9 +568,11 @@
     </section>
 
     <div class="controls" aria-label="Puzzle controls">
-      <button class="control-button" id="undo-button" type="button">↶ Undo</button>
-      <button class="control-button" id="reset-button" type="button">↻ Reset</button>
-      <button class="control-button" id="hint-button" type="button">HINT Hint · C3</button>
+      <button class="control-button" id="previous-level" type="button">PREV</button>
+      <button class="control-button" id="undo-button" type="button">UNDO</button>
+      <button class="control-button" id="reset-button" type="button">RESET</button>
+      <button class="control-button" id="hint-button" type="button">HINT C3</button>
+      <button class="control-button" id="next-level" type="button">NEXT</button>
     </div>
     <p class="hint">Green roads are connected · Zombies block unsafe tiles · First clears earn coins</p>
   </main>
@@ -660,6 +662,8 @@
     const undoButton = document.getElementById("undo-button");
     const resetButton = document.getElementById("reset-button");
     const hintButton = document.getElementById("hint-button");
+    const previousLevelButton = document.getElementById("previous-level");
+    const nextLevelButton = document.getElementById("next-level");
     const shopButton = document.getElementById("shop-button");
     const shopOverlay = document.getElementById("shop-overlay");
     const closeShopButton = document.getElementById("close-shop");
@@ -1126,12 +1130,14 @@
       levelDisplay.textContent = `${currentLevel}/${MAX_LEVEL}`;
       movesDisplay.textContent = String(moves);
       coinsDisplay.textContent = coins.toLocaleString();
-      hintButton.textContent = `HINT Hint · C${getEquippedWeapon().hintCost}`;
+      hintButton.textContent = `HINT C${getEquippedWeapon().hintCost}`;
       const record = progress.completed[String(currentLevel)];
       bestDisplay.textContent = record ? `${record.bestMoves} / ${record.stars}S` : `Par ${puzzle.parMoves}`;
       undoButton.disabled = state !== "playing" || history.length === 0;
       resetButton.disabled = state !== "playing";
       hintButton.disabled = state !== "playing";
+      previousLevelButton.disabled = state === "celebrating" || state === "shop" || currentLevel <= 1;
+      nextLevelButton.disabled = state === "celebrating" || state === "shop" || currentLevel >= progress.unlockedLevel;
     }
 
     function showOverlay(icon, title, text, buttonLabel, showInstructions = false, stars = 0) {
@@ -1151,7 +1157,7 @@
 
     function rotateTile(tile) {
       if (state !== "playing" || tile.kind !== "road") return;
-      history.push({ tile, rotation: tile.rotation });
+      history.push({ tile, rotation: tile.rotation, coinCost: 0 });
       tile.rotation = (tile.rotation + 1) % 4;
       tile.bump = 1;
       moves += 1;
@@ -1187,14 +1193,16 @@
       const bestStars = previous ? Math.max(previous.stars, stars) : stars;
       progress.completed[key] = { bestMoves, stars: bestStars };
       progress.unlockedLevel = Math.max(progress.unlockedLevel, Math.min(MAX_LEVEL, currentLevel + 1));
-      const reward = firstClear ? 10 + stars * 5 + currentLevel * 2 : 0;
+      const firstClearReward = firstClear ? 10 + stars * 5 + currentLevel * 2 : 0;
+      const routeCoins = puzzle.tiles.filter((tile) => tile.kind === "road" && tile.hasCoin).length;
+      const reward = firstClearReward + routeCoins;
       coins += reward;
       saveProgress();
       updateInterface();
       showOverlay(
         "OUT",
         "Safe Route Found!",
-        `${moves} moves · Par ${puzzle.parMoves}.${reward > 0 ? ` First-clear reward: ${reward} coins.` : " Level already rewarded."}`,
+        `${moves} moves · Par ${puzzle.parMoves}. Route coins: ${routeCoins}.${firstClearReward > 0 ? ` First-clear bonus: ${firstClearReward}.` : " Replay route secured."}`,
         currentLevel < MAX_LEVEL ? "Next Puzzle" : "Replay Puzzle",
         false,
         stars
@@ -1207,6 +1215,10 @@
       previous.tile.rotation = previous.rotation;
       previous.tile.bump = 0.45;
       moves = Math.max(0, moves - 1);
+      if (previous.coinCost > 0) {
+        coins += previous.coinCost;
+        saveProgress();
+      }
       connectedTiles = calculateConnectedTiles();
       updateInterface();
       playTone(260, 0.06, "triangle", 0.03);
@@ -1218,6 +1230,16 @@
       message = "Puzzle reset";
       messageTimer = 1.2;
       playTone(220, 0.08, "triangle", 0.035);
+    }
+
+    function navigateLevel(direction) {
+      if (state === "celebrating" || state === "shop") return;
+      const target = Math.max(1, Math.min(progress.unlockedLevel, currentLevel + direction));
+      if (target === currentLevel) return;
+      loadLevel(target);
+      message = `Level ${target}`;
+      messageTimer = 1.2;
+      playTone(direction > 0 ? 430 : 310, 0.07, "triangle", 0.035);
     }
 
     function useHint() {
@@ -1232,7 +1254,7 @@
 
       const wrongTile = puzzle.tiles.find((tile) => tile.kind === "road" && tile.rotation % (isStraight(tile.solutionConnections) ? 2 : 4) !== 0);
       if (!wrongTile) return;
-      history.push({ tile: wrongTile, rotation: wrongTile.rotation });
+      history.push({ tile: wrongTile, rotation: wrongTile.rotation, coinCost: hintCost });
       wrongTile.rotation = 0;
       wrongTile.bump = 1;
       moves += 1;
@@ -1647,6 +1669,8 @@
     undoButton.addEventListener("click", undoMove);
     resetButton.addEventListener("click", resetLevel);
     hintButton.addEventListener("click", useHint);
+    previousLevelButton.addEventListener("click", () => navigateLevel(-1));
+    nextLevelButton.addEventListener("click", () => navigateLevel(1));
     shopButton.addEventListener("click", openShop);
     closeShopButton.addEventListener("click", closeShop);
     shopOverlay.addEventListener("click", (event) => {

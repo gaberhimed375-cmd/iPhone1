@@ -346,6 +346,7 @@
       </div>
     </section>
 
+    <div class="sr-only" id="game-status" role="status" aria-live="polite"></div>
     <section class="board" id="board" aria-label="Cartoon animal matching cards"></section>
 
     <div class="controls">
@@ -385,6 +386,7 @@
     const overlay = document.getElementById("overlay");
     const result = document.getElementById("result");
     const playAgainButton = document.getElementById("play-again");
+    const gameStatus = document.getElementById("game-status");
 
     let firstCard = null;
     let secondCard = null;
@@ -393,7 +395,10 @@
     let matchedPairs = 0;
     let elapsedSeconds = 0;
     let timerId = null;
+    let timerStartedAt = null;
+    let timerAccumulatedMs = 0;
     let gameStarted = false;
+    let matchStreak = 0;
     let gameToken = 0;
     let audioContext = null;
 
@@ -444,7 +449,7 @@
 
     function updateBestDisplay() {
       const best = readBestScore();
-      bestDisplay.textContent = best ? `${best.moves} moves` : "—";
+      bestDisplay.textContent = best ? `${best.moves} / ${formatTime(best.time)}` : "—";
     }
 
     function isBetterScore(current, previous) {
@@ -460,20 +465,33 @@
     }
 
     function updateTimer() {
-      elapsedSeconds += 1;
+      const activeMs = timerStartedAt === null ? 0 : performance.now() - timerStartedAt;
+      elapsedSeconds = Math.floor((timerAccumulatedMs + activeMs) / 1000);
       timeDisplay.textContent = formatTime(elapsedSeconds);
     }
 
     function startTimer() {
-      if (gameStarted) {
-        return;
-      }
-
+      if (gameStarted) return;
       gameStarted = true;
-      timerId = window.setInterval(updateTimer, 1000);
+      timerStartedAt = performance.now();
+      timerId = window.setInterval(updateTimer, 200);
+    }
+
+    function pauseTimer() {
+      if (timerStartedAt === null) return;
+      timerAccumulatedMs += performance.now() - timerStartedAt;
+      timerStartedAt = null;
+      updateTimer();
+    }
+
+    function resumeTimer() {
+      if (!gameStarted || timerStartedAt !== null || matchedPairs === ANIMALS.length) return;
+      timerStartedAt = performance.now();
+      if (timerId === null) timerId = window.setInterval(updateTimer, 200);
     }
 
     function stopTimer() {
+      pauseTimer();
       if (timerId !== null) {
         window.clearInterval(timerId);
         timerId = null;
@@ -564,6 +582,11 @@
       boardLocked = false;
     }
 
+    function cardLabel(card) {
+      const label = card?.dataset.label || "creature";
+      return label.charAt(0).toUpperCase() + label.slice(1);
+    }
+
     function handleCardClick(event) {
       const selectedCard = event.currentTarget;
 
@@ -602,6 +625,8 @@
       firstCard.disabled = true;
       secondCard.disabled = true;
       matchedPairs += 1;
+      matchStreak += 1;
+      gameStatus.textContent = `${cardLabel(firstCard)} matched. ${ANIMALS.length - matchedPairs} pairs remain.${matchStreak >= 2 ? ` Streak ${matchStreak}.` : ""}`;
 
       playTone(660, 0.12);
       playTone(880, 0.16, 0.1);
@@ -616,6 +641,8 @@
       const first = firstCard;
       const second = secondCard;
       const currentToken = gameToken;
+      matchStreak = 0;
+      gameStatus.textContent = `${cardLabel(first)} and ${cardLabel(second)} do not match.`;
 
       window.setTimeout(() => {
         if (currentToken !== gameToken) {
@@ -626,7 +653,7 @@
         hideCard(second);
         playTone(220, 0.1);
         resetSelection();
-      }, 850);
+      }, 700);
     }
 
     function finishGame() {
@@ -641,9 +668,11 @@
       }
 
       updateBestDisplay();
+      const grade = moves === ANIMALS.length ? "PERFECT" : moves <= 11 ? "SHARP" : moves <= 15 ? "SOLID" : "CLEARED";
       result.textContent =
-        `You matched every pair in ${moves} moves and ${formatTime(elapsedSeconds)}.` +
-        (newBest ? " New best score!" : "");
+        `${grade}. Every pair found in ${moves} moves and ${formatTime(elapsedSeconds)}.` +
+        (newBest ? " New best score." : "");
+      gameStatus.textContent = `Game complete. Grade ${grade}. ${moves} moves in ${formatTime(elapsedSeconds)}.`;
 
       playTone(523, 0.14);
       playTone(659, 0.14, 0.14);
@@ -655,7 +684,7 @@
       }, 450);
     }
 
-    function startNewGame() {
+    function startNewGame(event) {
       gameToken += 1;
       stopTimer();
       firstCard = null;
@@ -664,7 +693,11 @@
       moves = 0;
       matchedPairs = 0;
       elapsedSeconds = 0;
+      timerStartedAt = null;
+      timerAccumulatedMs = 0;
       gameStarted = false;
+      matchStreak = 0;
+      gameStatus.textContent = "New deck ready.";
       movesDisplay.textContent = "0";
       timeDisplay.textContent = "0:00";
       overlay.classList.remove("visible");
@@ -674,7 +707,13 @@
       const cards = deck.map(createCard);
       board.append(...cards);
       updateBestDisplay();
+      if (event) cards[0]?.focus();
     }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) pauseTimer();
+      else resumeTimer();
+    });
 
     restartButton.addEventListener("click", startNewGame);
     playAgainButton.addEventListener("click", startNewGame);

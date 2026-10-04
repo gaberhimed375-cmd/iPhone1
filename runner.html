@@ -471,6 +471,7 @@
     let objects = [];
     let particles = [];
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let lastHud = {};
 
     function readNumber(key) {
       try {
@@ -608,15 +609,31 @@
       lastPatternType = "";
       objects = [];
       particles = [];
+      lastHud = {};
       updateHud();
     }
 
+    function getRunnerRank() {
+      if (totalCoins >= 700) return { name: "NIGHTSHIFT", color: "#d7ff3f", outline: "#52631c", next: null };
+      if (totalCoins >= 300) return { name: "RELIC", color: "#a777ff", outline: "#4a2c78", next: 700 };
+      if (totalCoins >= 100) return { name: "TRAILBLAZER", color: "#52dce8", outline: "#226d76", next: 300 };
+      return { name: "SCOUT", color: "#e88a3c", outline: "#713b27", next: 100 };
+    }
+
     function updateHud() {
-      distanceDisplay.textContent = `${Math.floor(distance).toLocaleString()} m`;
-      scoreDisplay.textContent = score.toLocaleString();
-      comboDisplay.textContent = `×${comboMultiplier}`;
-      runCoinsDisplay.textContent = runCoins.toLocaleString();
-      totalCoinsDisplay.textContent = totalCoins.toLocaleString();
+      const nextHud = {
+        distance: `${Math.floor(distance).toLocaleString()} m`,
+        score: score.toLocaleString(),
+        combo: `×${comboMultiplier}`,
+        runCoins: runCoins.toLocaleString(),
+        totalCoins: totalCoins.toLocaleString()
+      };
+      if (lastHud.distance !== nextHud.distance) distanceDisplay.textContent = nextHud.distance;
+      if (lastHud.score !== nextHud.score) scoreDisplay.textContent = nextHud.score;
+      if (lastHud.combo !== nextHud.combo) comboDisplay.textContent = nextHud.combo;
+      if (lastHud.runCoins !== nextHud.runCoins) runCoinsDisplay.textContent = nextHud.runCoins;
+      if (lastHud.totalCoins !== nextHud.totalCoins) totalCoinsDisplay.textContent = nextHud.totalCoins;
+      lastHud = nextHud;
     }
 
     function showOverlay(icon, title, message, buttonLabel, showInstructions = false) {
@@ -685,15 +702,15 @@
     }
 
     function moveLeft() {
-      if (state !== "running") return;
-      lane = Math.max(-1, lane - 1);
+      if (state !== "running" || lane <= -1) return;
+      lane -= 1;
       playTone(280, 0.04, "triangle", 0.025);
       vibrate(8);
     }
 
     function moveRight() {
-      if (state !== "running") return;
-      lane = Math.min(1, lane + 1);
+      if (state !== "running" || lane >= 1) return;
+      lane += 1;
       playTone(330, 0.04, "triangle", 0.025);
       vibrate(8);
     }
@@ -726,7 +743,9 @@
 
     function spawnPattern() {
       const lanes = [-1, 0, 1];
-      const reachableSafeLanes = lanes.filter((candidate) => Math.abs(candidate - lastSafeLane) <= 1);
+      const reachableSafeLanes = lanes.filter((candidate) =>
+        Math.abs(candidate - lastSafeLane) <= 1 && Math.abs(candidate - lane) <= 1
+      );
       const safeLane = reachableSafeLanes[Math.floor(Math.random() * reachableSafeLanes.length)];
       const advanced = distance >= 450;
       const expert = distance >= 1200;
@@ -818,7 +837,8 @@
     }
 
     function createBurst(x, y, color, amount = 9) {
-      for (let index = 0; index < amount; index += 1) {
+      const particleCount = reducedMotion ? Math.min(3, amount) : amount;
+      for (let index = 0; index < particleCount; index += 1) {
         const angle = Math.random() * Math.PI * 2;
         const particleSpeed = randomBetween(30, 115);
         particles.push({
@@ -916,6 +936,10 @@
             object.handled = true;
             distance += 8;
             awardScore(100);
+            const actionName = object.type === "arch" ? "CLEAN SLIDE" : object.type === "barrier" ? "CLEAN JUMP" : "CLEAN DODGE";
+            triggerFeedback(actionName, "#d7ff73");
+            createBurst(laneX(object.lane, object.progress), projectedY(object.progress), "#d7ff73", reducedMotion ? 3 : 7);
+            playTone(560, 0.06, "triangle", 0.025);
             if (combo > 0) comboExpiresAt = gameTime + 1.1;
           } else {
             hitObstacle(object);
@@ -1231,6 +1255,7 @@
     }
 
     function drawSpeedLines() {
+      if (reducedMotion) return;
       const intensity = clamp((speed - 0.22) / 0.12, 0, 1);
       if (intensity <= 0) return;
       context.save();
@@ -1302,8 +1327,9 @@
       context.lineTo(9 - stride, 35);
       context.stroke();
 
-      context.fillStyle = "#e88a3c";
-      context.strokeStyle = "#713b27";
+      const runnerRank = getRunnerRank();
+      context.fillStyle = runnerRank.color;
+      context.strokeStyle = runnerRank.outline;
       context.lineWidth = 3;
       roundedRectangle(-15, -12, 30, 34, 10);
       context.fill();
@@ -1504,7 +1530,7 @@
     showOverlay(
       "RR",
       "Ruins Rush",
-      `Race through original jungle ruins. Best: ${bestDistance.toLocaleString()} m · Score ${bestScore.toLocaleString()} · Coins: ${totalCoins.toLocaleString()}.`,
+      `Rank ${getRunnerRank().name}. Best ${bestDistance.toLocaleString()} m · Score ${bestScore.toLocaleString()} · Coins ${totalCoins.toLocaleString()}.${getRunnerRank().next ? ` Next rank at ${getRunnerRank().next} coins.` : " Maximum rank active."}`,
       "Start Running",
       true
     );

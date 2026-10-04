@@ -1,7 +1,7 @@
 "use strict";
 
 const CACHE_PREFIX = "pocket-arcade-";
-const CACHE_NAME = `${CACHE_PREFIX}v10`;
+const CACHE_NAME = `${CACHE_PREFIX}v11`;
 const APP_FILES = [
   "./",
   "./index.html",

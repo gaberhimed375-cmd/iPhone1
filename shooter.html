@@ -1557,6 +1557,19 @@
       plateContext.fillRect(0, 0, WIDTH, HEIGHT);
 
       plateContext.save();
+      plateContext.translate(185, 365);
+      plateContext.rotate(-0.42);
+      const galacticBand = plateContext.createLinearGradient(-260, 0, 260, 0);
+      galacticBand.addColorStop(0, "rgba(0,0,0,0)");
+      galacticBand.addColorStop(0.28, "rgba(168,185,255,0.035)");
+      galacticBand.addColorStop(0.5, "rgba(235,222,255,0.11)");
+      galacticBand.addColorStop(0.72, "rgba(119,148,255,0.035)");
+      galacticBand.addColorStop(1, "rgba(0,0,0,0)");
+      plateContext.fillStyle = galacticBand;
+      plateContext.fillRect(-280, -38, 560, 76);
+      plateContext.restore();
+
+      plateContext.save();
       plateContext.translate(318, 125);
       const planet = plateContext.createRadialGradient(-12, -15, 4, 0, 0, 54);
       planet.addColorStop(0, "#c7e8ff");
@@ -1566,6 +1579,24 @@
       plateContext.beginPath();
       plateContext.arc(0, 0, 48, 0, Math.PI * 2);
       plateContext.fill();
+      plateContext.save();
+      plateContext.beginPath();
+      plateContext.arc(0, 0, 48, 0, Math.PI * 2);
+      plateContext.clip();
+      const nightSide = plateContext.createLinearGradient(-48, 0, 48, 0);
+      nightSide.addColorStop(0, "rgba(1,3,16,.72)");
+      nightSide.addColorStop(.48, "rgba(4,8,28,.18)");
+      nightSide.addColorStop(1, "rgba(255,255,255,.04)");
+      plateContext.fillStyle = nightSide;
+      plateContext.fillRect(-50, -50, 100, 100);
+      plateContext.strokeStyle = "rgba(214,232,255,.08)";
+      plateContext.lineWidth = 2;
+      for (let band = -28; band <= 28; band += 14) {
+        plateContext.beginPath();
+        plateContext.ellipse(0, band, 44, 7, 0, 0, Math.PI * 2);
+        plateContext.stroke();
+      }
+      plateContext.restore();
       plateContext.strokeStyle = "rgba(196, 231, 255, 0.26)";
       plateContext.lineWidth = 7;
       plateContext.beginPath();
@@ -1664,9 +1695,11 @@
       context.closePath();
       context.fill();
 
-      const bodyGradient = context.createLinearGradient(-12, -25, 12, 22);
+      const bodyGradient = context.createLinearGradient(-14, -25, 16, 22);
       bodyGradient.addColorStop(0, skin.bodyStart);
-      bodyGradient.addColorStop(1, skin.bodyEnd);
+      bodyGradient.addColorStop(0.32, "rgba(255,255,255,.92)");
+      bodyGradient.addColorStop(0.5, skin.bodyEnd);
+      bodyGradient.addColorStop(1, skin.outline);
       context.fillStyle = bodyGradient;
       context.strokeStyle = skin.outline;
       context.lineWidth = 3;
@@ -1716,16 +1749,20 @@
         context.beginPath();
         context.ellipse(0, -13, 27, 22, 0, Math.PI, 0);
         context.fill();
-        context.fillStyle = "#fff";
+        const bossGlass = context.createLinearGradient(0, -30, 0, 4);
+        bossGlass.addColorStop(0, "rgba(225,250,255,.92)");
+        bossGlass.addColorStop(.4, "rgba(77,198,229,.78)");
+        bossGlass.addColorStop(1, "rgba(22,48,96,.92)");
+        context.fillStyle = bossGlass;
         context.beginPath();
-        context.arc(-12, -4, 8, 0, Math.PI * 2);
-        context.arc(12, -4, 8, 0, Math.PI * 2);
+        context.ellipse(0, -12, 23, 16, 0, Math.PI, 0);
         context.fill();
-        context.fillStyle = "#30235d";
-        context.beginPath();
-        context.arc(-10, -3, 3, 0, Math.PI * 2);
-        context.arc(10, -3, 3, 0, Math.PI * 2);
-        context.fill();
+        context.fillStyle = "#ff527f";
+        for (const x of [-26, 0, 26]) {
+          context.beginPath();
+          context.arc(x, 8, 3, 0, Math.PI * 2);
+          context.fill();
+        }
       } else {
         const bodyColor = enemy.type === "tank" ? "#ff9d45" : enemy.type === "zigzag" ? "#9b74ff" : "#68e3a3";
         const enemyGradient = context.createRadialGradient(-7, -9, 2, 0, 0, enemy.radius * 1.15);
@@ -1749,20 +1786,25 @@
         context.lineTo(enemy.radius + 8, 18);
         context.stroke();
 
-        context.fillStyle = "#fff";
+        const sensorGlow = context.createRadialGradient(0, -5, 1, 0, -5, 10);
+        sensorGlow.addColorStop(0, "#ffffff");
+        sensorGlow.addColorStop(0.25, enemy.type === "tank" ? "#ffd36a" : "#76f5ff");
+        sensorGlow.addColorStop(1, "rgba(25,35,64,0)");
+        context.fillStyle = sensorGlow;
         context.beginPath();
-        context.arc(-7, -4, 6, 0, Math.PI * 2);
-        context.arc(7, -4, 6, 0, Math.PI * 2);
+        context.arc(0, -5, 10, 0, Math.PI * 2);
         context.fill();
-        context.fillStyle = "#24204a";
+        context.fillStyle = "#11182c";
         context.beginPath();
-        context.arc(-6, -3, 2.5, 0, Math.PI * 2);
-        context.arc(6, -3, 2.5, 0, Math.PI * 2);
+        context.ellipse(0, -5, 4, 6, 0, 0, Math.PI * 2);
         context.fill();
-        context.strokeStyle = "#48204c";
-        context.lineWidth = 2;
+        context.strokeStyle = "rgba(255,255,255,.35)";
+        context.lineWidth = 1.5;
         context.beginPath();
-        context.arc(0, 5, 7, 0.15, Math.PI - 0.15);
+        context.moveTo(-enemy.radius + 7, 5);
+        context.lineTo(enemy.radius - 7, 5);
+        context.moveTo(-8, 11);
+        context.lineTo(8, 11);
         context.stroke();
 
         if (enemy.type === "tank") {

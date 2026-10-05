@@ -1410,57 +1410,70 @@
 
     function drawZombieTile(tile, center) {
       const map = getEquippedMap();
-      const wobble = Math.sin(pulseTime * 3 + tile.row + tile.column) * 0.08;
+      const variation = (tile.row * COLUMNS + tile.column) % 3;
+      const wobble = reducedMotion ? 0 : Math.sin(pulseTime * 2.1 + tile.row + tile.column) * 0.045;
       context.save();
       context.translate(center.x, center.y);
       context.rotate(wobble);
       roundedRectangle(-30, -30, 60, 60, 13);
       context.fillStyle = map.block;
       context.fill();
-      context.strokeStyle = "#3d5148";
+      context.strokeStyle = map.border;
       context.lineWidth = 2;
       context.stroke();
 
-      context.fillStyle = map.zombie;
-      context.strokeStyle = "#24372d";
-      context.lineWidth = 3;
+      context.fillStyle = "rgba(0,0,0,.34)";
       context.beginPath();
-      context.arc(0, -2, 18, 0, Math.PI * 2);
+      context.ellipse(2, 19, 21, 7, -0.12, 0, Math.PI * 2);
+      context.fill();
+
+      context.strokeStyle = variation === 1 ? "#354a39" : map.zombie;
+      context.lineWidth = 7;
+      context.lineCap = "round";
+      context.beginPath();
+      context.moveTo(-8, 4);
+      context.lineTo(-22, 13 + variation * 2);
+      context.moveTo(8, 3);
+      context.lineTo(22, 8 - variation * 2);
+      context.stroke();
+
+      const bodyGradient = context.createLinearGradient(-12, -5, 14, 18);
+      bodyGradient.addColorStop(0, variation === 2 ? "#59665c" : map.zombie);
+      bodyGradient.addColorStop(1, "#26342c");
+      context.fillStyle = bodyGradient;
+      context.strokeStyle = "#17231c";
+      context.lineWidth = 2.5;
+      roundedRectangle(-13, -3, 26, 30, 8);
       context.fill();
       context.stroke();
-      context.strokeStyle = "rgba(28, 43, 34, 0.65)";
+
+      const headGradient = context.createRadialGradient(-5, -15, 2, 0, -10, 17);
+      headGradient.addColorStop(0, "#b7c989");
+      headGradient.addColorStop(0.52, map.zombie);
+      headGradient.addColorStop(1, "#344a35");
+      context.fillStyle = headGradient;
+      context.beginPath();
+      context.arc(0, -12, 14, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+
+      context.strokeStyle = "rgba(34,45,35,.72)";
       context.lineWidth = 2;
       context.beginPath();
-      if ((tile.row + tile.column) % 3 === 0) {
-        context.moveTo(-12, -15);
-        context.lineTo(-5, -9);
-        context.lineTo(-10, -4);
-      } else if ((tile.row + tile.column) % 3 === 1) {
-        context.moveTo(5, -17);
-        context.lineTo(2, -8);
-        context.lineTo(11, -11);
+      if (variation === 0) {
+        context.moveTo(-10, -20); context.lineTo(-3, -14); context.lineTo(-9, -8);
+      } else if (variation === 1) {
+        context.moveTo(3, -24); context.lineTo(0, -14); context.lineTo(9, -17);
       } else {
-        context.arc(0, -3, 13, Math.PI * 1.08, Math.PI * 1.62);
+        context.arc(0, -11, 10, Math.PI * 1.05, Math.PI * 1.65);
       }
       context.stroke();
-      context.fillStyle = "#fff2a5";
+
+      context.fillStyle = "rgba(236,244,169,.9)";
       context.beginPath();
-      context.arc(-7, -5, 4, 0, Math.PI * 2);
-      context.arc(7, -5, 4, 0, Math.PI * 2);
+      context.ellipse(-5, -13, 2.5, 1.6, -.2, 0, Math.PI * 2);
+      context.ellipse(5, -13, 2.5, 1.6, .2, 0, Math.PI * 2);
       context.fill();
-      context.fillStyle = "#3b3140";
-      context.beginPath();
-      context.arc(-6, -4, 1.8, 0, Math.PI * 2);
-      context.arc(6, -4, 1.8, 0, Math.PI * 2);
-      context.fill();
-      context.strokeStyle = "#38463d";
-      context.lineWidth = 5;
-      context.beginPath();
-      context.moveTo(-13, 18);
-      context.lineTo(-23, 25);
-      context.moveTo(13, 18);
-      context.lineTo(23, 25);
-      context.stroke();
       context.restore();
     }
 
@@ -1497,7 +1510,16 @@
       context.save();
       context.translate(center.x, center.y);
 
-      context.fillStyle = skin.skin;
+      context.fillStyle = "rgba(0,0,0,.34)";
+      context.beginPath();
+      context.ellipse(2, 24, 18, 6, 0, 0, Math.PI * 2);
+      context.fill();
+
+      const faceGradient = context.createRadialGradient(-4, -8, 1, 0, -5, 13);
+      faceGradient.addColorStop(0, "rgba(255,255,255,.45)");
+      faceGradient.addColorStop(.2, skin.skin);
+      faceGradient.addColorStop(1, skin.hair);
+      context.fillStyle = faceGradient;
       context.beginPath();
       context.arc(0, -5, 10, 0, Math.PI * 2);
       context.fill();
@@ -1507,7 +1529,11 @@
       context.arc(0, -7, 8, Math.PI, Math.PI * 2);
       context.stroke();
 
-      context.fillStyle = skin.body;
+      const clothingGradient = context.createLinearGradient(-12, 3, 14, 28);
+      clothingGradient.addColorStop(0, "rgba(255,255,255,.32)");
+      clothingGradient.addColorStop(.25, skin.body);
+      clothingGradient.addColorStop(1, skin.outline);
+      context.fillStyle = clothingGradient;
       context.strokeStyle = skin.outline;
       context.lineWidth = 3;
       roundedRectangle(-12, 5, 24, 22, 7);

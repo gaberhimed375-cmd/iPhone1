@@ -1149,7 +1149,11 @@
       context.fill();
       context.restore();
       if (object.type === "barrier") {
-        context.fillStyle = "#a96732";
+        const barrierGradient = context.createLinearGradient(-30, -20, 30, 18);
+        barrierGradient.addColorStop(0, "#d2a16c");
+        barrierGradient.addColorStop(.35, "#8b5b34");
+        barrierGradient.addColorStop(1, "#4d3020");
+        context.fillStyle = barrierGradient;
         context.strokeStyle = "#50321f";
         context.lineWidth = 4;
         roundedRectangle(-31, -18, 62, 34, 7);
@@ -1164,7 +1168,11 @@
         context.lineTo(14, 8);
         context.stroke();
       } else if (object.type === "arch") {
-        context.fillStyle = "#75644b";
+        const archGradient = context.createLinearGradient(-38, -64, 38, 16);
+        archGradient.addColorStop(0, "#a69a7d");
+        archGradient.addColorStop(.45, "#6d624d");
+        archGradient.addColorStop(1, "#3b352d");
+        context.fillStyle = archGradient;
         context.strokeStyle = "#3e362b";
         context.lineWidth = 4;
         roundedRectangle(-35, -62, 14, 78, 5);
@@ -1177,7 +1185,11 @@
         context.fill();
         context.stroke();
       } else {
-        context.fillStyle = "#6d746d";
+        const rockGradient = context.createRadialGradient(-9, -15, 2, 0, 0, 38);
+        rockGradient.addColorStop(0, "#aab0a8");
+        rockGradient.addColorStop(.45, "#686f69");
+        rockGradient.addColorStop(1, "#303632");
+        context.fillStyle = rockGradient;
         context.strokeStyle = "#363d38";
         context.lineWidth = 4;
         context.beginPath();
@@ -1345,7 +1357,11 @@
       context.stroke();
 
       const runnerRank = getRunnerRank();
-      context.fillStyle = runnerRank.color;
+      const jacketGradient = context.createLinearGradient(-15, -12, 16, 22);
+      jacketGradient.addColorStop(0, "rgba(255,255,255,.42)");
+      jacketGradient.addColorStop(.22, runnerRank.color);
+      jacketGradient.addColorStop(1, runnerRank.outline);
+      context.fillStyle = jacketGradient;
       context.strokeStyle = runnerRank.outline;
       context.lineWidth = 3;
       roundedRectangle(-15, -12, 30, 34, 10);
@@ -1370,7 +1386,11 @@
       context.lineTo(23 + stride * 0.5, 11);
       context.stroke();
 
-      context.fillStyle = "#dca06e";
+      const skinGradient = context.createRadialGradient(-4, -29, 2, 0, -24, 13);
+      skinGradient.addColorStop(0, "#f2c79b");
+      skinGradient.addColorStop(.55, "#dca06e");
+      skinGradient.addColorStop(1, "#8b5c42");
+      context.fillStyle = skinGradient;
       context.beginPath();
       context.arc(0, -24, 12, 0, Math.PI * 2);
       context.fill();

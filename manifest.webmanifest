@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Pocket Arcade",
   "short_name": "Arcade",
-  "description": "Four polished touch-first games: memory matching, space survival, path puzzles, and endless running.",
+  "description": "Five polished touch-first games: memory matching, space survival, path puzzles, endless running, and stealth pursuit.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -42,6 +42,12 @@
       "short_name": "Rush",
       "description": "Play the endless runner game",
       "url": "runner.html"
+    },
+    {
+      "name": "Hide and Seek",
+      "short_name": "Hide",
+      "description": "Play the stealth pursuit game",
+      "url": "hide-and-seek.html"
     }
   ]
 }

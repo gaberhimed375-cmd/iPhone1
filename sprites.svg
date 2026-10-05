@@ -30,6 +30,13 @@
     <path d="M10 31h25M7 45h19M12 72h18" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
   </symbol>
 
+  <symbol id="game-hide-seek" viewBox="0 0 100 100">
+    <path d="M10 50s15-25 40-25 40 25 40 25-15 25-40 25S10 50 10 50Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/>
+    <circle cx="50" cy="50" r="13" fill="currentColor"/>
+    <path d="M50 37v26M37 50h26" stroke="#171a27" stroke-width="4" opacity=".55"/>
+    <path d="M18 18h18M18 18v18M82 18H64M82 18v18M18 82h18M18 82V64M82 82H64M82 82V64" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  </symbol>
+
   <symbol id="trophy" viewBox="0 0 100 100">
     <path d="M31 15h38v22c0 15-8 25-19 25S31 52 31 37Z" fill="none" stroke="currentColor" stroke-width="7"/>
     <path d="M31 24H16c0 17 7 26 20 27M69 24h15c0 17-7 26-20 27M50 62v14M34 85h32" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>

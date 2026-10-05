@@ -1551,3 +1551,38 @@ body[data-game="matching"] .card.matched .card-front {
   35% { opacity: 0.7; }
   100% { opacity: 0; transform: translateX(38%) rotate(8deg); }
 }
+
+/* Hide and Seek */
+body[data-theme="hide-seek"] {
+  --accent: #5df3dc;
+  --accent-2: #ff5a69;
+  --accent-rgb: 93, 243, 220;
+}
+
+body[data-theme="home"] .hide-seek {
+  --card-accent: #5df3dc;
+  --card-accent-2: #ff5a69;
+}
+
+body[data-game="hide-seek"] {
+  background:
+    radial-gradient(circle at 50% -12%, rgba(93, 243, 220, 0.16), transparent 27rem),
+    linear-gradient(165deg, #05080d, #101823 60%, #140d19);
+}
+
+body[data-game="hide-seek"] #alert {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  letter-spacing: 0.04em;
+}
+
+body[data-theme="home"] .game-card:nth-child(5) {
+  animation-delay: 320ms;
+}
+
+@media (min-width: 720px) {
+  body[data-theme="home"] .game-card:nth-child(5) {
+    grid-column: 1 / -1;
+    width: calc(50% - 8px);
+    justify-self: center;
+  }
+}

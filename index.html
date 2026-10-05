@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Pocket Arcade Nightshift is a collection of four original, touch-first games built for instant and offline play.">
+  <meta name="description" content="Pocket Arcade Nightshift is a collection of five original, touch-first games built for instant and offline play.">
   <meta name="theme-color" content="#050608">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,10 +33,10 @@
       <span class="eyebrow">NO LOGIN / NO FEED / NO WAIT</span>
       <h1>PLAY LIKE<br><span class="gradient-word">YOU MEAN IT.</span></h1>
       <p class="hero-copy">
-        Four original games tuned for one thumb, short breaks, and the dangerous decision to play one more round.
+        Five original games tuned for one thumb, short breaks, and the dangerous decision to play one more round.
       </p>
       <div class="hero-stats" aria-label="Arcade specifications">
-        <span class="hero-stat"><b>04</b> TITLES</span>
+        <span class="hero-stat"><b>05</b> TITLES</span>
         <span class="hero-stat"><b id="total-plays">00</b> SESSIONS</span>
         <span class="hero-stat"><b>01</b> TAP TO PLAY</span>
         <span class="hero-stat"><b>24/7</b> OFFLINE</span>
@@ -49,8 +49,8 @@
 
     <div class="signal-strip" aria-hidden="true">
       <div class="signal-track">
-        <span>MEMORY UNDER PRESSURE</span><i></i><span>ALIENS ON APPROACH</span><i></i><span>ROUTES COMPROMISED</span><i></i><span>THE RUINS NEVER END</span><i></i>
-        <span>MEMORY UNDER PRESSURE</span><i></i><span>ALIENS ON APPROACH</span><i></i><span>ROUTES COMPROMISED</span><i></i><span>THE RUINS NEVER END</span><i></i>
+        <span>MEMORY UNDER PRESSURE</span><i></i><span>ALIENS ON APPROACH</span><i></i><span>ROUTES COMPROMISED</span><i></i><span>THE RUINS NEVER END</span><i></i><span>STAY OUT OF SIGHT</span><i></i>
+        <span>MEMORY UNDER PRESSURE</span><i></i><span>ALIENS ON APPROACH</span><i></i><span>ROUTES COMPROMISED</span><i></i><span>THE RUINS NEVER END</span><i></i><span>STAY OUT OF SIGHT</span><i></i>
       </div>
     </div>
 
@@ -58,7 +58,7 @@
       <div class="section-heading">
         <div>
           <span class="section-kicker">SELECT PROGRAM</span>
-          <h2 id="games-title">Four ways in.</h2>
+          <h2 id="games-title">Five ways in.</h2>
         </div>
         <p>Local progress / instant resume</p>
       </div>
@@ -115,6 +115,19 @@
             </div>
           </div>
         </a>
+
+        <a class="game-card hide-seek" data-index="05" data-game-id="hide-seek" href="hide-and-seek.html">
+          <div class="game-icon" aria-hidden="true"><svg><use href="sprites.svg#game-hide-seek"></use></svg></div>
+          <div class="game-copy">
+            <span class="game-genre">STEALTH / PURSUIT</span>
+            <h2>Hide and Seek</h2>
+            <p>Read the patrol. Break the sightline. Recover every signal without being found.</p>
+            <div class="card-footer">
+              <span class="best" id="hide-seek-best">LEVEL 1 / C 0</span>
+              <span class="play" aria-hidden="true">ENTER</span>
+            </div>
+          </div>
+        </a>
       </nav>
     </section>
 
@@ -129,7 +142,7 @@
 
     <footer class="home-footer">
       <span>ORIGINAL GAMES / LOCAL SAVES / ZERO TRACKING</span>
-      <span>BUILD 0010</span>
+      <span>BUILD 0013</span>
     </footer>
   </main>
 
@@ -181,6 +194,14 @@
       document.getElementById("runner-best").textContent =
         `BEST ${runnerDistance.toLocaleString()} M / C ${runnerCoins.toLocaleString()}`;
 
+      const hideCoins = readInteger("hide-and-seek-coins-v1");
+      const hideProgress = readJson("hide-and-seek-progress-v1", { unlocked: 1 });
+      const hideLevel = Number.isInteger(hideProgress.unlocked)
+        ? Math.max(1, Math.min(12, hideProgress.unlocked))
+        : 1;
+      document.getElementById("hide-seek-best").textContent =
+        `LEVEL ${hideLevel} / C ${hideCoins.toLocaleString()}`;
+
       const plays = readInteger("pocket-arcade-plays-v1");
       document.getElementById("total-plays").textContent = String(plays).padStart(2, "0");
       try {
@@ -189,7 +210,8 @@
           matching: { name: "CRITTER MATCH", url: "matching.html" },
           shooter: { name: "STAR DEFENDER", url: "shooter.html" },
           zombie: { name: "ZOMBIE ESCAPE", url: "zombie.html" },
-          runner: { name: "RUINS RUSH", url: "runner.html" }
+          runner: { name: "RUINS RUSH", url: "runner.html" },
+          "hide-seek": { name: "HIDE AND SEEK", url: "hide-and-seek.html" }
         };
         if (lastGame && games[lastGame]) {
           const continueLink = document.getElementById("continue-game");
